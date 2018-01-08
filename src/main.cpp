@@ -1,6 +1,21 @@
-#include <iostream>
+// Local
+#include <ui/win.hpp>
+#include <util/result.hpp>
 
-int main()
+namespace vast
 {
-	std::cout << "Hello, World!" << std::endl;
+	ui::Win win;
+
+	extern "C" int main()
+	{
+		win.open();
+		while (win.is_open())
+		{
+			win.poll();
+		}
+
+		win.close();
+
+		return 0;
+	}
 }
