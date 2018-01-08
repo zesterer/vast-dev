@@ -3,6 +3,7 @@
 
 // Local
 #include <util/panic.hpp>
+#include <util/result.hpp>
 
 // Lib
 #define GLFW_INCLUDE_NONE
@@ -17,7 +18,10 @@ namespace vast::ui
 
 		bool is_open()
 		{
-			return !glfwWindowShouldClose(this->_gwin);
+			if (this->_gwin == nullptr)
+				return false;
+			else
+				return !glfwWindowShouldClose(this->_gwin);
 		}
 
 		void open()
@@ -29,7 +33,7 @@ namespace vast::ui
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 			if ((this->_gwin = glfwCreateWindow(800, 500, "Window", nullptr, nullptr)) == nullptr)
-				util::panic("Failured to create GLFW window");
+				util::panic("Failed to create GLFW window");
 
 			// TODO : Report OpenGL version
 			//int gl_maj = glfwGetWindowAttrib(this->_gwin, GLFW_CONTEXT_VERSION_MAJOR);
@@ -39,14 +43,37 @@ namespace vast::ui
 			glfwMakeContextCurrent(this->_gwin);
 		}
 
-		void poll()
+		enum class PollError { InvalidWindow };
+		USE_RESULT util::Status<PollError> poll()
 		{
-			glfwPollEvents();
+			if (this->_gwin == nullptr)
+				return util::Status<PollError>::failure(PollError::InvalidWindow);
+			else
+			{
+				glfwPollEvents();
+				return util::Status<PollError>::success();
+			}
+		}
+
+		enum class DisplayError { InvalidWindow };
+		USE_RESULT util::Status<DisplayError> display()
+		{
+			if (this->_gwin == nullptr)
+				return util::Status<DisplayError>::failure(DisplayError::InvalidWindow);
+			else
+			{
+				glfwSwapBuffers(this->_gwin);
+				return util::Status<DisplayError>::success();
+			}
 		}
 
 		void close()
 		{
-			glfwDestroyWindow(this->_gwin);
+			if (this->_gwin != nullptr)
+			{
+				glfwDestroyWindow(this->_gwin);
+				this->_gwin = nullptr;
+			}
 		}
 
 		~Win()

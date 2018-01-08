@@ -33,6 +33,16 @@ namespace vast::util
 				return this->_error;
 		}
 
+		T const& except(std::string const& msg, const char* file = __FILE__, int line = __LINE__) const
+		{
+			if (!this->_valid)
+				panic(msg, file, line);
+			else
+				return this->_data;
+		}
+
+		void ignore() const {}
+
 		static Result<T, E> success(T data = T())
 		{
 			Result<T, E> r(true);
