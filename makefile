@@ -112,6 +112,7 @@ TOOL_DIR ?= $(abspath $(dir $(shell which $(CC))))
 
 SRC_RFILES += $(shell ls $(SRC_ROOT)/src/*.{s,S,c,cpp} 2> /dev/null)
 SRC_RFILES += $(shell ls $(SRC_ROOT)/src/util/*.{s,S,c,cpp} 2> /dev/null)
+SRC_RFILES += $(shell ls $(SRC_ROOT)/src/core/*.{s,S,c,cpp} 2> /dev/null)
 SRC_RFILES += $(shell ls $(SRC_ROOT)/src/ui/*.{s,S,c,cpp} 2> /dev/null)
 
 SRC_FILES = $(abspath $(SRC_RFILES))

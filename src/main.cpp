@@ -9,7 +9,7 @@ namespace vast
 	{
 		// Configure scene
 		core::Scene scene;
-		scene.register_component(core::create_entity_component());
+		scene.add_component_type(core::entity_component_type());
 
 		// Set up scene
 		scene.setup();

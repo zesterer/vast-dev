@@ -14,12 +14,12 @@ namespace vast::core
 		cm_id id;
 	};
 
-	struct Component
+	struct ComponentType
 	{
 		std::function<void (ComponentRoot&, int, id_t)> create;
 		std::function<void (ComponentRoot&, float)> tick;
 
-		Component(
+		ComponentType(
 			std::function<void (ComponentRoot&, int, id_t)> create,
 			std::function<void (ComponentRoot&, float)> tick
 		) :
@@ -27,6 +27,8 @@ namespace vast::core
 			tick(tick)
 		{}
 	};
+
+	int cm_register_component();
 }
 
 #endif

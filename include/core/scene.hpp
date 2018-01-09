@@ -16,26 +16,26 @@ namespace vast::core
 		float _time;
 		id_t _id_counter;
 		ComponentRoot _root;
-		std::vector<Component> _components;
+		std::vector<ComponentType> _component_types;
 
 		void tick(float dt)
 		{
 			this->_time += dt;
 
-			for (Component c : this->_components)
+			for (ComponentType c : this->_component_types)
 				c.tick(this->_root, dt);
 		}
 
-		void register_component(Component c)
+		void add_component_type(ComponentType c)
 		{
-			this->_components.push_back(c);
+			this->_component_types.push_back(c);
 		}
 
 		void create_object(int variant)
 		{
 			id_t new_id = ++this->_id_counter;
 
-			for (Component c : this->_components)
+			for (ComponentType c : this->_component_types)
 				c.create(this->_root, variant, new_id);
 		}
 
