@@ -1,16 +1,24 @@
 // Local
 #include <core/scene.hpp>
+#include <core/entity.hpp>
 #include <ui/win.hpp>
 
 namespace vast
 {
 	extern "C" int main()
 	{
+		// Configure scene
 		core::Scene scene;
-		ui::Win win;
+		scene.register_component(core::create_entity_component());
 
-		// Open the window, run the game loop
+		// Set up scene
+		scene.setup();
+
+		// Configure window
+		ui::Win win;
 		win.open();
+
+		// Game loop
 		while (win.is_open())
 		{
 			win.poll().ignore();
