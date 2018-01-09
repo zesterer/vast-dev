@@ -24,7 +24,7 @@
 EXEC_NAME = vast
 
 # Build type : 'release' or 'debug'
-BUILD_TYPE = release
+BUILD_TYPE = debug
 
 PLATFORM = linux
 

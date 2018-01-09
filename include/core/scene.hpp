@@ -3,6 +3,7 @@
 
 // Local
 #include <core/cm.hpp>
+#include <core/cmnt/entity.hpp>
 
 // Std
 #include <vector>
@@ -14,39 +15,52 @@ namespace vast::core
 	struct Scene
 	{
 		float _time;
-		id_t _id_counter;
-		ComponentRoot _root;
-		std::vector<ComponentType> _component_types;
+		ComponentRoot cr;
+		std::vector<id_t> _objects;
 
 		void tick(float dt)
 		{
+			this->cr.call_tick(dt);
 			this->_time += dt;
-
-			for (ComponentType c : this->_component_types)
-				c.tick(this->_root, dt);
 		}
 
-		void add_component_type(ComponentType c)
+		id_t create_object(int variant)
 		{
-			this->_component_types.push_back(c);
+			id_t new_id = this->cr.new_entity_id();
+			this->cr.call_create(variant, new_id);
+
+			this->_objects.push_back(new_id);
+			return new_id;
 		}
 
-		void create_object(int variant)
+		void remove_object(id_t id)
 		{
-			id_t new_id = ++this->_id_counter;
-
-			for (ComponentType c : this->_component_types)
-				c.create(this->_root, variant, new_id);
+			this->cr.call_remove(id);
 		}
 
 		void setup()
 		{
 			// Create a few test objects
 			for (size_t i = 0; i < 10; i ++)
-				this->create_object(0);
+				this->create_object(cmnt::entity_variant);
 		}
 
-		Scene() : _time(0.0f), _id_counter(0) {}
+		void clear()
+		{
+			// Remove all objects from the scene
+			while (this->_objects.size() > 0)
+			{
+				this->remove_object(this->_objects.back());
+				this->_objects.pop_back();
+			}
+		}
+
+		Scene() : _time(0.0f) {}
+
+		~Scene()
+		{
+			this->clear();
+		}
 	};
 }
 

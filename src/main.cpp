@@ -1,6 +1,6 @@
 // Local
 #include <core/scene.hpp>
-#include <core/entity.hpp>
+#include <core/cmnt/entity.hpp>
 #include <ui/win.hpp>
 
 namespace vast
@@ -9,7 +9,7 @@ namespace vast
 	{
 		// Configure scene
 		core::Scene scene;
-		scene.add_component_type(core::entity_component_type());
+		scene.cr.add_type(core::cmnt::entity_component_type());
 
 		// Set up scene
 		scene.setup();
