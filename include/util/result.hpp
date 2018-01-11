@@ -4,9 +4,16 @@
 // Local
 #include <util/panic.hpp>
 
+// Std
+#include <type_traits>
+
 namespace vast::util
 {
 	#define USE_RESULT __attribute__((warn_unused_result))
+
+	template <typename U> void _murder(U& obj) { obj.~U(); }
+	//template <typename U> void _murder(U obj) {}
+	//void _murder(char obj) {}
 
 	template <typename T, typename E>
 	struct Result
@@ -17,6 +24,11 @@ namespace vast::util
 			V obj;
 
 			_Container(V obj) : obj(obj) {}
+			_Container(_Container<V> const& other) : obj(other.obj) {}
+			_Container<V>& operator=(_Container<V> const& other) { this->obj = other.obj; return *this; }
+			_Container(_Container<V>&& other) : obj(other.obj) {}
+			_Container<V>& operator=(_Container<V>&& other) { this->obj = other.obj; return *this; }
+			~_Container() {}
 		};
 
 		bool _valid;
@@ -33,7 +45,7 @@ namespace vast::util
 				return this->_data.obj;
 		}
 
-		T const& get_error(const char* file = __FILE__, int line = __LINE__) const
+		E const& get_error(const char* file = __FILE__, int line = __LINE__) const
 		{
 			if (this->_valid)
 				panic("Attempted to access erro from successful result", file, line);
@@ -66,6 +78,29 @@ namespace vast::util
 		}
 
 		Result(bool valid) : _valid(valid) {}
+		Result(Result<T, E> const& other) : _valid(other._valid) // Copy construction
+		{
+			if (this->_valid)
+				this->_data = other._data;
+			else
+				this->_error = other._error;
+		}
+
+		Result(Result<T, E>&& other) : _valid(other._valid) // Move construction
+		{
+			if (this->_valid)
+				this->_data = other._data;
+			else
+				this->_error = other._error;
+		}
+
+		~Result()
+		{
+			if (this->_valid)
+				_murder(_data.obj);
+			else
+				_murder(_error.obj);
+		}
 	};
 
 	template <typename E>

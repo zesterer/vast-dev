@@ -5,6 +5,7 @@
 #include <core/cm.hpp>
 #include <core/engine/entityvar.hpp>
 #include <util/result.hpp>
+#include <gfx/res/mesh.hpp>
 
 // Std
 #include <iostream>
@@ -15,6 +16,8 @@ namespace vast::gfx
 	// A figure is any entity that has an associated 3D model, texture, and optional normal map
 	struct Figure
 	{
+		res::Mesh mesh;
+
 		Figure() { std::cout << "Created Figure" << std::endl; }
 		~Figure() { std::cout << "Deleted Figure" << std::endl; }
 	};
@@ -50,12 +53,12 @@ namespace vast::gfx
 		figures.remove(root, id);
 	}
 
-	// Perform a tick on a figure component
+	// Perform a tick on all figure components
 	void figure_tick(core::ComponentRoot& root, float dt)
 	{
 		(void)root;
 		(void)dt;
-		// TODO : Do figures need a tick component?
+		// TODO : Do figures need a tick method?
 		//for (auto pair : figures[root.id])
 		//	// Tick here
 	}

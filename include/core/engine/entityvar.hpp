@@ -55,7 +55,7 @@ namespace vast::core::engine
 		entities.remove(root, id);
 	}
 
-	// Perform a tick on an entity component
+	// Perform a tick on all entity components
 	void entity_tick(ComponentRoot& root, float dt)
 	{
 		for (auto pair : entities.components(root))
