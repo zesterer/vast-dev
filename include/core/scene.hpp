@@ -3,7 +3,8 @@
 
 // Local
 #include <core/cm.hpp>
-#include <core/engine/entity.hpp>
+#include <core/engine/entityvar.hpp>
+#include <gfx/figurevar.hpp>
 
 // Std
 #include <vector>
@@ -42,7 +43,7 @@ namespace vast::core
 		{
 			// Create a few test objects
 			for (size_t i = 0; i < 10; i ++)
-				this->create_object(engine::ENTITY_VARIANT_ID);
+				this->create_object(gfx::FIGURE_VARIANT_ID);
 		}
 
 		void clear()

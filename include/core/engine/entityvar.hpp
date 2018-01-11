@@ -12,7 +12,6 @@
 // Std
 #include <iostream>
 #include <map>
-#include <vector>
 
 namespace vast::core::engine
 {
@@ -84,7 +83,7 @@ namespace vast::core::engine
 	}
 
 	// Register the entity as a component variant
-	__attribute__((constructor)) void register_entity()
+	__attribute__((constructor)) void register_entity_var()
 	{
 		ENTITY_VARIANT_ID = cm_register_component();
 	}

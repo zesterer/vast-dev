@@ -1,7 +1,7 @@
 #ifndef VAST_HPP_GFX_CTX
 #define VAST_HPP_GFX_CTX
 
-namespace vast::gfx::ctx
+namespace vast::gfx
 {
 	struct Ctx
 	{
