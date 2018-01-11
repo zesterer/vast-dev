@@ -3,11 +3,13 @@
 
 namespace vast::core
 {
-	ComponentType::ComponentType(
-		std::function<void (ComponentRoot&, int, id_t)> create,
+	ComponentVariant::ComponentVariant(
+		int variant_id,
+		std::function<void (ComponentRoot&, id_t)> create,
 		std::function<void (ComponentRoot&, id_t)> remove,
 		std::function<void (ComponentRoot&, float)> tick
 	) :
+		variant_id(variant_id),
 		create(create),
 		remove(remove),
 		tick(tick)

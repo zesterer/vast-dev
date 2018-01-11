@@ -3,6 +3,7 @@
 
 // Lib
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 // Local
 #include <core/cm.hpp>
@@ -15,28 +16,27 @@
 
 namespace vast::core::engine
 {
+	// A structure defining the layout and features of the entity component
 	struct Entity
 	{
-		glm::vec3 pos;
-		glm::vec3 vel;
+		glm::vec3 pos, vel;
+		glm::quat ori, rot;
 
 		void tick(float dt)
 		{
-			this->pos += this->vel * dt;
+			this->pos += this->vel * dt; // Apply velocity
+			this->ori = (this->rot * dt) * this->ori; // Apply rotation
 		}
 	};
 
-	int entity_variant;
-	// TODO: Replace the std::map with a more performant cache-friendly structure
+	// Used to store the unique variant id for entities
+	static int ENTITY_VARIANT_ID;
+
+	// A hashmap containing all components of the entity variant (TODO: Replace the std::map with a more performant cache-friendly structure)
 	std::map<cm_id, std::map<id_t, Entity>> entities;
 
+	// Possible errors when attempting to manipulate entities
 	enum class EntityError { INVALID_ROOT, NOT_AN_ENTITY };
-
-	// Register the entity as a component variant
-	__attribute__((constructor)) void register_entity()
-	{
-		entity_variant = cm_register_component();
-	}
 
 	// Get a reference to an entity, given a component root and an object id
 	util::Result<Entity&, EntityError> entity_get(ComponentRoot& root, id_t id)
@@ -55,11 +55,8 @@ namespace vast::core::engine
 	}
 
 	// Create a new entity component
-	void entity_create(ComponentRoot& root, int variant, id_t id)
+	void entity_create(ComponentRoot& root, id_t id)
 	{
-		if (variant != entity_variant)
-			return;
-
 		entities[root.id].emplace(id, Entity());
 		std::cout << "Created entity!" << std::endl;
 	}
@@ -86,10 +83,17 @@ namespace vast::core::engine
 		}
 	}
 
-	// Create a new entity component type
-	ComponentType entity_component_type()
+	// Register the entity as a component variant
+	__attribute__((constructor)) void register_entity()
 	{
-		return ComponentType(
+		ENTITY_VARIANT_ID = cm_register_component();
+	}
+
+	// Create an instance describing the entity variant
+	ComponentVariant entity_variant()
+	{
+		return ComponentVariant(
+			ENTITY_VARIANT_ID,
 			&entity_create,
 			&entity_remove,
 			&entity_tick

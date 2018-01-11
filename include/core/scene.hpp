@@ -42,7 +42,7 @@ namespace vast::core
 		{
 			// Create a few test objects
 			for (size_t i = 0; i < 10; i ++)
-				this->create_object(engine::entity_variant);
+				this->create_object(engine::ENTITY_VARIANT_ID);
 		}
 
 		void clear()
