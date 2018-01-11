@@ -1,5 +1,5 @@
-#ifndef VAST_HPP_CORE_CMNT_ENTITY
-#define VAST_HPP_CORE_CMNT_ENTITY
+#ifndef VAST_HPP_CORE_ENGINE_ENTITY
+#define VAST_HPP_CORE_ENGINE_ENTITY
 
 // Lib
 #include <glm/glm.hpp>
@@ -13,7 +13,7 @@
 #include <map>
 #include <vector>
 
-namespace vast::core::cmnt
+namespace vast::core::engine
 {
 	struct Entity
 	{

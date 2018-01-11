@@ -1,7 +1,7 @@
 	#
 # file : makefile
 #
-# Copyright (c) 2017 Joshua Barretto <joshua.s.barretto@gmail.com>
+# Copyright (c) 2018 Joshua Barretto <joshua.s.barretto@gmail.com>
 #
 # This file is part of Vast.
 #

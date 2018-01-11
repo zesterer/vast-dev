@@ -3,7 +3,7 @@
 
 // Local
 #include <core/cm.hpp>
-#include <core/cmnt/entity.hpp>
+#include <core/engine/entity.hpp>
 
 // Std
 #include <vector>
@@ -42,7 +42,7 @@ namespace vast::core
 		{
 			// Create a few test objects
 			for (size_t i = 0; i < 10; i ++)
-				this->create_object(cmnt::entity_variant);
+				this->create_object(engine::entity_variant);
 		}
 
 		void clear()
