@@ -15,6 +15,8 @@ namespace vast
 
 		// Configure scene
 		core::Scene scene;
+
+		// Add component variants to the scene
 		scene.cr.add_variant(core::engine::entity_variant());
 		scene.cr.add_variant(gfx::figure_variant());
 
@@ -33,7 +35,7 @@ namespace vast
 			// Simulate the scene
 			scene.tick(1.0f);
 
-			// TODO : Do something with this
+			// Render everything to the screen
 			ctx.render();
 
 			// Display the contents of the scene
