@@ -24,7 +24,7 @@ namespace vast::gfx
 	{
 		glm::mat4 mat;
 		res::Mesh mesh;
-		std::weak_ptr<Pipeline> pipeline;
+		Pipeline& pipeline;
 
 		void update_from(std::shared_ptr<core::engine::Entity> entity)
 		{
@@ -33,72 +33,37 @@ namespace vast::gfx
 			this->mat = glm::scale(this->mat, entity->scale);
 		}
 
-		Figure() { std::cout << "Created Figure" << std::endl; }
+		Figure(Pipeline& pipeline) : pipeline(pipeline)
+		{
+			std::cout << "Created Figure" << std::endl;
+		}
+
 		~Figure() { std::cout << "Deleted Figure" << std::endl; }
 	};
 
 	// Used to store the unique variant id for models
-	static int FIGURE_VARIANT_ID;
+	extern int FIGURE_VARIANT_ID;
 
 	// A box containing all figures
-	core::ComponentBox<Figure> figures;
+	extern core::ComponentBox<Figure> figures;
 
 	// Possible errors when attempting to manipulate figures
 	enum class FigureError { INVALID_ROOT, NOT_A_FIGURE };
 
 	// Get a reference to a figure, given a component root and an object id
-	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot& root, id_t id)
-	{
-		return figures.get(root, id);
-	}
+	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot& root, id_t id);
 
 	// Create a new figure component
-	void figure_create(core::ComponentRoot& root, id_t id)
-	{
-		// Create a dependency components first
-		core::engine::entity_create(root, id);
-
-		figures.emplace(root, id);
-	}
+	void figure_create(core::ComponentRoot& root, id_t id);
 
 	// Remove a figure component
-	void figure_remove(core::ComponentRoot& root, id_t id)
-	{
-		figures.remove(root, id);
-	}
+	void figure_remove(core::ComponentRoot& root, id_t id);
 
 	// Perform a tick on all figure components
-	void figure_tick(core::ComponentRoot& root, float dt)
-	{
-		(void)dt;
-
-		for (auto pair : figures.components(root))
-		{
-			Figure& figure = *pair.second;
-
-			// Update the figure component matrices from the entity component
-			auto r = core::engine::entity_get(root, pair.first);
-			if (r.is_success())
-				figure.update_from(r.get_data());
-		}
-	}
-
-	// Register the figure as a component variant
-	__attribute__((constructor)) void register_figure_var()
-	{
-		FIGURE_VARIANT_ID = core::cm_register_component();
-	}
+	void figure_tick(core::ComponentRoot& root, float dt);
 
 	// Create an instance describing the figure variant
-	core::ComponentVariant figure_variant()
-	{
-		return core::ComponentVariant(
-			FIGURE_VARIANT_ID,
-			&figure_create,
-			&figure_remove,
-			&figure_tick
-		);
-	}
+	core::ComponentVariant figure_variant();
 }
 
 #endif

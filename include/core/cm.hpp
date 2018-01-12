@@ -19,17 +19,20 @@ namespace vast::core
 	// ComponentVariant describes a component variant and its functions
 	struct ComponentVariant
 	{
+		typedef std::function<void (ComponentRoot&)> init_func_t;
 		typedef std::function<void (ComponentRoot&, id_t)> create_func_t;
 		typedef std::function<void (ComponentRoot&, id_t)> remove_func_t;
 		typedef std::function<void (ComponentRoot&, float)> tick_func_t;
 
 		int variant_id;
+		init_func_t init;
 		create_func_t create;
 		remove_func_t remove;
 		tick_func_t tick;
 
 		ComponentVariant(
 			int variant_id,
+			init_func_t init,
 			create_func_t create,
 			remove_func_t remove,
 			tick_func_t tick
@@ -47,6 +50,7 @@ namespace vast::core
 		void add_variant(ComponentVariant type)
 		{
 			this->_types.push_back(type);
+			type.init(*this); // Init the variant
 		}
 
 		// Generate a new unique entity id

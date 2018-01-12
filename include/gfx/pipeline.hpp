@@ -6,6 +6,7 @@
 
 // Std
 #include <string>
+#include <initializer_list>
 
 namespace vast::gfx
 {
@@ -14,6 +15,8 @@ namespace vast::gfx
 	struct InputFormat
 	{
 		std::vector<std::pair<DataType, int>> items;
+
+		InputFormat(std::initializer_list<std::pair<DataType, int>> items) : items(items) {}
 	};
 
 	struct Target

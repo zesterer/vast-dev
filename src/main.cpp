@@ -16,12 +16,12 @@ namespace vast
 		// Configure scene
 		core::Scene scene;
 
+		// Configure graphics context
+		gfx::Ctx ctx;
+
 		// Add component variants to the scene
 		scene.cr.add_variant(core::engine::entity_variant());
 		scene.cr.add_variant(gfx::figure_variant());
-
-		// Configure graphics context
-		gfx::Ctx ctx;
 
 		// Set up scene
 		scene.setup();

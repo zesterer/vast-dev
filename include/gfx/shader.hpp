@@ -5,7 +5,7 @@
 #include <util/result.hpp>
 
 // Lib
-#include <glbinding/gl/types.h>
+#include <glbinding/gl/gl.h>
 
 // Std
 #include <string>
@@ -47,6 +47,7 @@ namespace vast::gfx
 				{
 					std::vector<char> log_buff(log_len + 1);
 					gl::glGetShaderInfoLog(gl_id, log_len, nullptr, &log_buff[0]);
+					std::cout << "Shader compilation error: " << std::string(&log_buff[0]) << std::endl;
 					return util::Result<gl::GLuint, std::string>::failure(std::string(&log_buff[0]));
 				}
 				else
@@ -86,7 +87,7 @@ namespace vast::gfx
 				return util::Result<Shader, Error>::failure(Error::CANNOT_OPEN_FILE);
 			else
 			{
-				auto shader_r = Shader::from_strings(frag_r.get_data(), frag_r.get_data());
+				auto shader_r = Shader::from_strings(vert_r.get_data(), frag_r.get_data());
 				if (shader_r.is_failure())
 					return util::Result<Shader, Error>::failure(Error::COMPILE_ERROR);
 				else
