@@ -18,7 +18,7 @@ namespace vast::core::engine
 	// A structure defining the layout and features of the entity component
 	struct Entity
 	{
-		glm::vec3 pos, vel;
+		glm::vec3 pos, vel, scale;
 		glm::quat ori, rot;
 
 		void tick(float dt)
@@ -38,7 +38,7 @@ namespace vast::core::engine
 	core::ComponentBox<Entity> entities;
 
 	// Get a reference to an entity, given a component root and an object id
-	util::Result<Entity&, core::ComponentBox<Entity>::Error> entity_get(ComponentRoot& root, id_t id)
+	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot& root, id_t id)
 	{
 		return entities.get(root, id);
 	}

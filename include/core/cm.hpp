@@ -19,16 +19,20 @@ namespace vast::core
 	// ComponentVariant describes a component variant and its functions
 	struct ComponentVariant
 	{
+		typedef std::function<void (ComponentRoot&, id_t)> create_func_t;
+		typedef std::function<void (ComponentRoot&, id_t)> remove_func_t;
+		typedef std::function<void (ComponentRoot&, float)> tick_func_t;
+
 		int variant_id;
-		std::function<void (ComponentRoot&, id_t)> create;
-		std::function<void (ComponentRoot&, id_t)> remove;
-		std::function<void (ComponentRoot&, float)> tick;
+		create_func_t create;
+		remove_func_t remove;
+		tick_func_t tick;
 
 		ComponentVariant(
 			int variant_id,
-			std::function<void (ComponentRoot&, id_t)> create,
-			std::function<void (ComponentRoot&, id_t)> remove,
-			std::function<void (ComponentRoot&, float)> tick
+			create_func_t create,
+			remove_func_t remove,
+			tick_func_t tick
 		);
 	};
 
@@ -82,27 +86,26 @@ namespace vast::core
 		ComponentRoot() : id(0) {}
 	};
 
+	enum class ComponentError { INVALID_ROOT, NO_SUCH_COMPONENT };
 	template <typename T>
 	struct ComponentBox
 	{
-		enum class Error { INVALID_ROOT, NO_SUCH_COMPONENT };
-
 		// A hashmap containing all components of this variant (TODO: Replace the std::map with a more performant cache-friendly structure)
 		std::map<cm_id, std::map<id_t, std::shared_ptr<T>>> _items;
 
-		util::Result<T&, Error> get(ComponentRoot& root, id_t id)
+		util::Result<std::shared_ptr<T>, ComponentError> get(ComponentRoot& root, id_t id)
 		{
 			// Have we yet registed this component root?
 			auto it0 = this->_items.find(root.id);
 			if (it0 == this->_items.end())
-				return util::Result<T&, Error>::failure(Error::INVALID_ROOT);
+				return util::Result<std::shared_ptr<T>, ComponentError>::failure(ComponentError::INVALID_ROOT);
 
 			// Have we registered this id as a figure?
 			auto it1 = it0->second.find(id);
 			if (it1 == it0->second.end())
-				return util::Result<T&, Error>::failure(Error::NO_SUCH_COMPONENT);
+				return util::Result<std::shared_ptr<T>, ComponentError>::failure(ComponentError::NO_SUCH_COMPONENT);
 
-			return util::Result<T&, Error>::success(*it1->second);
+			return util::Result<std::shared_ptr<T>, ComponentError>::success(it1->second);
 		}
 
 		template <typename ... Args>
