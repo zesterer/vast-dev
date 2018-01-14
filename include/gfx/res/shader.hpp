@@ -18,18 +18,43 @@ namespace vast::gfx::res
 {
 	struct Shader
 	{
+	public:
 		gl::GLuint gl_id;
 
-		Shader() {}
-		Shader(gl::GLuint vert_gl_id, gl::GLuint frag_gl_id)
+		void use() const
 		{
-			this->gl_id = gl::glCreateProgram();
-			gl::glAttachShader(this->gl_id, vert_gl_id);
-			gl::glAttachShader(this->gl_id, frag_gl_id);
-			gl::glLinkProgram(this->gl_id);
+			gl::glUseProgram(this->gl_id);
 		}
 
-		enum class Error { CANNOT_OPEN_FILE, COMPILE_ERROR };
+		Shader(gl::GLuint gl_id) : gl_id(gl_id) {}
+
+		enum class Error { CANNOT_OPEN_FILE, COMPILE_ERROR, LINK_ERROR };
+
+		static util::Result<Shader, Error> from(gl::GLuint vert, gl::GLuint frag)
+		{
+			gl::GLuint gl_id = gl::glCreateProgram();
+			gl::glAttachShader(gl_id, vert);
+			gl::glAttachShader(gl_id, frag);
+			gl::glLinkProgram(gl_id);
+
+			gl::glDetachShader(gl_id, vert);
+			gl::glDetachShader(gl_id, frag);
+
+			gl::GLint result = 0, log_len = 0;
+			gl::glGetProgramiv(gl_id, gl::GL_LINK_STATUS, &result);
+			if (result == (gl::GLint)gl::GL_FALSE)
+			{
+				gl::glGetProgramiv(gl_id, gl::GL_INFO_LOG_LENGTH, &log_len);
+				std::vector<char> log_buff(log_len + 1);
+				gl::glGetProgramInfoLog(gl_id, log_len, nullptr, &log_buff[0]);
+				std::cout << "Shader link error: " << std::string(&log_buff[0]) << std::endl;
+
+				gl::glDeleteProgram(gl_id);
+
+				return util::Result<Shader, Error>::failure(Error::LINK_ERROR);
+			}
+				return util::Result<Shader, Error>::success(Shader(gl_id));
+		}
 
 		static util::Result<Shader, Error> from_strings(std::string const& vert_str, std::string const& frag_str)
 		{
@@ -40,11 +65,11 @@ namespace vast::gfx::res
 				gl::glShaderSource(gl_id, 1, &src_buff, nullptr);
 				gl::glCompileShader(gl_id);
 
-				gl::GLint result, log_len;
+				gl::GLint result = 0, log_len = 0;
 				gl::glGetShaderiv(gl_id, gl::GL_COMPILE_STATUS, &result);
-				gl::glGetShaderiv(gl_id, gl::GL_INFO_LOG_LENGTH, &log_len);
-				if (log_len > 1)
+				if (result == (gl::GLint)gl::GL_FALSE)
 				{
+					gl::glGetShaderiv(gl_id, gl::GL_INFO_LOG_LENGTH, &log_len);
 					std::vector<char> log_buff(log_len + 1);
 					gl::glGetShaderInfoLog(gl_id, log_len, nullptr, &log_buff[0]);
 					std::cout << "Shader compilation error: " << std::string(&log_buff[0]) << std::endl;
@@ -55,12 +80,22 @@ namespace vast::gfx::res
 			};
 
 			// Create the shaders
-			auto vert_r = create_shader(gl::GL_VERTEX_SHADER, vert_str);
-			auto frag_r = create_shader(gl::GL_FRAGMENT_SHADER, frag_str);
-			if (vert_r.is_failure() || frag_r.is_failure())
-				return util::Result<Shader, Error>::failure(Error::COMPILE_ERROR);
+			auto vert = create_shader(gl::GL_VERTEX_SHADER, vert_str);
+			auto frag = create_shader(gl::GL_FRAGMENT_SHADER, frag_str);
+			if (vert && frag)
+			{
+				auto shader = Shader::from(*vert, *frag);
+
+				gl::glDeleteShader(*vert);
+				gl::glDeleteShader(*frag);
+
+				if (shader)
+					return util::Result<Shader, Error>::success(*shader);
+				else
+					return util::Result<Shader, Error>::failure(shader.get_error());
+			}
 			else
-				return util::Result<Shader, Error>::success(Shader(vert_r.get_data(), frag_r.get_data()));
+				return util::Result<Shader, Error>::failure(Error::COMPILE_ERROR);
 		}
 
 		static util::Result<Shader, Error> from_files(std::string const& vert_filename, std::string const& frag_filename)
@@ -81,18 +116,17 @@ namespace vast::gfx::res
 			std::string vert_text, frag_text;
 
 			// Read files
-			auto vert_r = read_file(vert_filename);
-			auto frag_r = read_file(frag_filename);
-			if (vert_r.is_failure() || frag_r.is_failure())
-				return util::Result<Shader, Error>::failure(Error::CANNOT_OPEN_FILE);
-			else
+			auto vert = read_file(vert_filename);
+			auto frag = read_file(frag_filename);
+			if (vert && frag)
 			{
-				auto shader_r = Shader::from_strings(vert_r.get_data(), frag_r.get_data());
-				if (shader_r.is_failure())
-					return util::Result<Shader, Error>::failure(Error::COMPILE_ERROR);
+				if (auto shader = Shader::from_strings(*vert, *frag))
+					return util::Result<Shader, Error>::success(*shader);
 				else
-					return util::Result<Shader, Error>::success(shader_r.get_data());
+					return util::Result<Shader, Error>::failure(shader.get_error());
 			}
+			else
+				return util::Result<Shader, Error>::failure(Error::CANNOT_OPEN_FILE);
 		}
 	};
 }

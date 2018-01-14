@@ -133,9 +133,13 @@ namespace vast::gfx::res
 				switch (c)
 				{
 				case '\n':
-					this->parse(line.str());
-					line.str(std::string());
-					break;
+					if (auto r = this->parse(line.str()))
+					{
+						line.str(std::string());
+						break;
+					}
+					else
+						return util::Status<OBJMesh::Error>::failure(Error::INVALID_LINE);
 
 				default:
 					line << c;
@@ -151,12 +155,13 @@ namespace vast::gfx::res
 	{
 		std::vector<Poly> _polys;
 
-		size_t size() { return this->_polys.size(); }
+		size_t size() const { return this->_polys.size(); }
 
 		void add(Poly p) { this->_polys.push_back(p); }
 
 		// TODO: Make this nicer
-		gl::GLfloat const* get_data() { return reinterpret_cast<gl::GLfloat*>(&this->_polys[0]); }
+		gl::GLfloat const* get_data() const { return reinterpret_cast<gl::GLfloat const*>(&this->_polys[0]); }
+		size_t get_vertex_count() const { return this->_polys.size() * 3; }
 
 		Mesh() {}
 		Mesh(OBJMesh& objmesh)
@@ -168,12 +173,11 @@ namespace vast::gfx::res
 		static util::Result<Mesh, OBJMesh::Error> from(std::string const& filename)
 		{
 			OBJMesh obj;
-			auto r = obj.read_from(filename);
 
-			if (r.is_failure())
-				return util::Result<Mesh, OBJMesh::Error>::failure(r.get_error());
-			else
+			if (auto r = obj.read_from(filename))
 				return util::Result<Mesh, OBJMesh::Error>::success(Mesh(obj));
+			else
+				return util::Result<Mesh, OBJMesh::Error>::failure(r.get_error());
 		}
 	};
 }

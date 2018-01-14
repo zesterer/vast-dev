@@ -1,10 +1,11 @@
 // Local
-#include <gfx/figurevar.hpp>
+#include <gfx/figure.hpp>
 #include <gfx/pipeline.hpp>
 #include <util/panic.hpp>
 
 // Std
 #include <optional>
+#include <functional>
 
 namespace vast::gfx
 {
@@ -15,13 +16,12 @@ namespace vast::gfx
 	core::ComponentBox<Figure> figures;
 
 	// Get a reference to a figure, given a component root and an object id
-	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot& root, id_t id)
+	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot const& root, id_t id)
 	{
 		return figures.get(root, id);
 	}
 
 	// The pipeline used for all figures by default
-	static bool pipeline_initiated = false;
 	std::optional<Pipeline> figure_pipeline;
 
 	// Initiate the figure variant
@@ -30,24 +30,15 @@ namespace vast::gfx
 		(void)root;
 
 		// Create the figure pipeline if needed
-		if (!pipeline_initiated)
+		if (!figure_pipeline)
 		{
-			auto shader_r = res::Shader::from_files("data/shader/vert.glsl", "data/shader/frag.glsl");
-
-			if (shader_r.is_failure())
+			if (auto shader = res::Shader::from_files("data/shader/vert.glsl", "data/shader/frag.glsl"))
+				figure_pipeline = Pipeline(
+					*shader,
+					Target()
+				);
+			else
 				util::panic("Could not create figure pipeline shader");
-
-			figure_pipeline = Pipeline(
-				res::Format({
-					{res::FormatType::F32, 3}, // Position
-					{res::FormatType::F32, 3}, // Color
-					{res::FormatType::F32, 3}, // Normal
-					{res::FormatType::F32, 2}, // UVs
-				}),
-				shader_r.get_data(),
-				Target()
-			);
-			pipeline_initiated = true;
 		}
 	}
 
@@ -58,7 +49,7 @@ namespace vast::gfx
 		core::engine::entity_create(root, id);
 
 		if (figure_pipeline)
-			figures.emplace(root, id, *figure_pipeline);
+			figures.emplace(root, id, std::ref(*figure_pipeline));
 		else
 			util::panic("Tried to initiate Figure without first creating figure pipeline");
 	}
@@ -79,9 +70,8 @@ namespace vast::gfx
 			Figure& figure = *pair.second;
 
 			// Update the figure component matrices from the entity component
-			auto r = core::engine::entity_get(root, pair.first);
-			if (r.is_success())
-				figure.update_from(r.get_data());
+			if (auto entity = core::engine::entity_get(root, pair.first))
+				figure.update_from(*entity);
 		}
 	}
 

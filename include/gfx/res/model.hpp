@@ -3,6 +3,8 @@
 
 // Local
 #include <gfx/res/mesh.hpp>
+#include <gfx/format.hpp>
+#include <util/panic.hpp>
 
 // Lib
 #include <glbinding/gl/gl.h>
@@ -11,19 +13,43 @@ namespace vast::gfx::res
 {
 	struct Model
 	{
+		bool _valid;
 		gl::GLuint gl_id;
+		gl::GLenum gl_primitive;
+		size_t vertex_count;
 
-		void bind()
+		void bind() const
 		{
-			gl::glBindBuffer(gl::GL_ARRAY_BUFFER, this->gl_id);
+			if (this->_valid)
+				gl::glBindBuffer(gl::GL_ARRAY_BUFFER, this->gl_id);
+			else
+				util::panic("Attempted to bind invalid model");
 		}
 
-		Model(Mesh& mesh)
+		Model() : _valid(false), vertex_count(0) {}
+		Model(
+			Mesh const& mesh,
+			gl::GLenum gl_primitive,
+			std::initializer_list<std::tuple<std::string, FormatType, int>> attrs
+		) :
+			_valid(true),
+			gl_primitive(gl_primitive),
+			vertex_count(mesh.get_vertex_count())
 		{
-			gl::glGenBuffers(1, &this->gl_id);
-			this->bind();
+			// Generate and bind VAO
+			gl::glGenVertexArrays(1, &this->gl_id);
+			gl::glBindVertexArray(this->gl_id);
 
-			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * 3 * mesh.size(), mesh.get_data(), gl::GL_STATIC_DRAW);
+			// Generate and bind VBO
+			gl::GLuint vbo_gl_id;
+			gl::glGenBuffers(1, &vbo_gl_id);
+			gl::glBindBuffer(gl::GL_ARRAY_BUFFER, vbo_gl_id);
+
+			// Load data into VBO
+			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * mesh.get_vertex_count(), mesh.get_data(), gl::GL_STATIC_DRAW);
+
+			// Bind format
+			bind_format_attributes(this->gl_id, attrs);
 		}
 	};
 }

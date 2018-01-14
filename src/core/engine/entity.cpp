@@ -1,5 +1,5 @@
 // Local
-#include <core/engine/entityvar.hpp>
+#include <core/engine/entity.hpp>
 
 namespace vast::core::engine
 {
@@ -10,7 +10,7 @@ namespace vast::core::engine
 	core::ComponentBox<Entity> entities;
 
 	// Get a reference to an entity, given a component root and an object id
-	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot& root, id_t id)
+	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot const& root, id_t id)
 	{
 		return entities.get(root, id);
 	}
@@ -38,11 +38,7 @@ namespace vast::core::engine
 	void entity_tick(ComponentRoot& root, float dt)
 	{
 		for (auto pair : entities.components(root))
-		{
-			Entity& entity = *pair.second;
-
-			entity.tick(dt);
-		}
+			pair.second->tick(dt);
 	}
 
 	// Create an instance describing the entity variant

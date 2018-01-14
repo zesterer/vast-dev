@@ -1,9 +1,9 @@
 // Local
 #include <ui/win.hpp>
 #include <core/scene.hpp>
-#include <core/engine/entityvar.hpp>
-#include <gfx/ctx.hpp>
-#include <gfx/figurevar.hpp>
+#include <core/engine/entity.hpp>
+#include <gfx/renderer.hpp>
+#include <gfx/figure.hpp>
 
 namespace vast
 {
@@ -16,12 +16,12 @@ namespace vast
 		// Configure scene
 		core::Scene scene;
 
-		// Configure graphics context
-		gfx::Ctx ctx;
+		// Configure renderer
+		gfx::Renderer renderer;
 
 		// Add component variants to the scene
-		scene.cr.add_variant(core::engine::entity_variant());
-		scene.cr.add_variant(gfx::figure_variant());
+		scene.get_croot().add_variant(core::engine::entity_variant());
+		scene.get_croot().add_variant(gfx::figure_variant());
 
 		// Set up scene
 		scene.setup();
@@ -30,16 +30,16 @@ namespace vast
 		while (win.is_open())
 		{
 			// Poll window events
-			win.poll().ignore();
+			win.poll().except("Could not poll window");
 
 			// Simulate the scene
 			scene.tick(1.0f);
 
-			// Render everything to the screen
-			ctx.render();
+			// Render the scene to the screen
+			renderer.render(scene);
 
 			// Display the contents of the scene
-			win.display().ignore();
+			win.display().except("Could not display window contents");
 		}
 
 		win.close();

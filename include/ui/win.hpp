@@ -29,7 +29,6 @@ namespace vast::ui
 			// Suggest a 3.2 OpenGL core context
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (int)gl::GL_TRUE);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 			if ((this->_gwin = glfwCreateWindow(800, 500, "Window", nullptr, nullptr)) == nullptr)

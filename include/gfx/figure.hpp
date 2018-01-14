@@ -1,11 +1,12 @@
-#ifndef VAST_HPP_GFX_FIGUREVAR
-#define VAST_HPP_GFX_FIGUREVAR
+#ifndef VAST_HPP_GFX_FIGURE
+#define VAST_HPP_GFX_FIGURE
 
 // Local
 #include <core/cm.hpp>
-#include <core/engine/entityvar.hpp>
+#include <core/engine/entity.hpp>
 #include <util/result.hpp>
 #include <gfx/res/mesh.hpp>
+#include <gfx/res/model.hpp>
 #include <gfx/pipeline.hpp>
 
 // Lib
@@ -23,7 +24,7 @@ namespace vast::gfx
 	struct Figure
 	{
 		glm::mat4 mat;
-		res::Mesh mesh;
+		res::Model model;
 		Pipeline& pipeline;
 
 		void update_from(std::shared_ptr<core::engine::Entity> entity)
@@ -35,11 +36,27 @@ namespace vast::gfx
 
 		Figure(Pipeline& pipeline) : pipeline(pipeline)
 		{
-			auto mesh_r = res::Mesh::from("data/mesh/craft.obj");
-			if (mesh_r.is_success())
-				this->mesh = mesh_r.get_data();
-			else
-				util::panic("Could not load mesh");
+			res::Mesh m;
+			m.add(res::Poly(
+				res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+				res::Vert(glm::vec3(1, -1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+				res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0))
+			));
+
+			this->model = res::Model(m,
+				gl::GL_TRIANGLES,
+				{
+					{ "vert_pos", FormatType::F32, 3 }, // Position
+					{ "vert_color", FormatType::F32, 3 }, // Color
+					{ "vert_norm", FormatType::F32, 3 }, // Normal
+					{ "vert_uv", FormatType::F32, 2 }, // UVs
+				}
+			);
+
+			// if (auto mesh = res::Mesh::from("data/mesh/craft.obj"))
+			// 	this->model = res::Model(*mesh);
+			// else
+			// 	util::panic("Could not load mesh");
 
 			std::cout << "Created Figure" << std::endl;
 		}
@@ -57,7 +74,7 @@ namespace vast::gfx
 	enum class FigureError { INVALID_ROOT, NOT_A_FIGURE };
 
 	// Get a reference to a figure, given a component root and an object id
-	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot& root, id_t id);
+	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot const& root, id_t id);
 
 	// Create a new figure component
 	void figure_create(core::ComponentRoot& root, id_t id);

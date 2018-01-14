@@ -97,7 +97,7 @@ namespace vast::core
 		// A hashmap containing all components of this variant (TODO: Replace the std::map with a more performant cache-friendly structure)
 		std::map<cm_id, std::map<id_t, std::shared_ptr<T>>> _items;
 
-		util::Result<std::shared_ptr<T>, ComponentError> get(ComponentRoot& root, id_t id)
+		util::Result<std::shared_ptr<T>, ComponentError> get(ComponentRoot const& root, id_t id)
 		{
 			// Have we yet registed this component root?
 			auto it0 = this->_items.find(root.id);
@@ -113,12 +113,12 @@ namespace vast::core
 		}
 
 		template <typename ... Args>
-		void emplace(core::ComponentRoot& root, id_t id, Args ... args)
+		void emplace(core::ComponentRoot const& root, id_t id, Args ... args)
 		{
 			this->_items[root.id][id] = std::make_shared<T>(args ...);
 		}
 
-		void remove(ComponentRoot& root, id_t id)
+		void remove(ComponentRoot const& root, id_t id)
 		{
 			auto it = this->_items[root.id].find(id);
 			if (it != this->_items[root.id].end())
@@ -126,7 +126,7 @@ namespace vast::core
 		}
 
 		// TODO: This API SERIOUSLY needs improving, shouldn't just return map reference
-		std::map<id_t, std::shared_ptr<T>>& components(ComponentRoot& root)
+		std::map<id_t, std::shared_ptr<T>>& components(ComponentRoot const& root)
 		{
 			return this->_items[root.id];
 		}

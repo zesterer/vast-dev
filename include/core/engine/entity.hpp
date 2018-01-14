@@ -38,7 +38,7 @@ namespace vast::core::engine
 	extern core::ComponentBox<Entity> entities;
 
 	// Get a reference to an entity, given a component root and an object id
-	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot& root, id_t id);
+	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot const& root, id_t id);
 
 	// Create a new entity component
 	void entity_create(ComponentRoot& root, id_t id);
