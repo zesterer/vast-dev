@@ -14,6 +14,7 @@
 #include <array>
 #include <fstream>
 #include <sstream>
+#include <initializer_list>
 
 namespace vast::gfx::res
 {
@@ -158,6 +159,11 @@ namespace vast::gfx::res
 		size_t size() const { return this->_polys.size(); }
 
 		void add(Poly p) { this->_polys.push_back(p); }
+		void add(std::initializer_list<Poly> polys)
+		{
+			for (auto p : polys)
+				this->_polys.push_back(p);
+		}
 
 		// TODO: Make this nicer
 		gl::GLfloat const* get_data() const { return reinterpret_cast<gl::GLfloat const*>(&this->_polys[0]); }

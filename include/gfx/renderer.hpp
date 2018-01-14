@@ -59,31 +59,34 @@ namespace vast::gfx
 			glbinding::setAfterCallback(
 				[] (glbinding::FunctionCall const& c)
 				{
-					if (std::string(c.function->name()) == "glGetError")
-						return;
-
-					std::cout << c.function->name() << "(";
-					for (size_t i = 0; i < c.parameters.size(); i ++)
+					if (false)
 					{
-						std::cout << c.parameters[i]->asString();
-						if (i < c.parameters.size() - 1)
-							std::cout << ", ";
+						if (std::string(c.function->name()) == "glGetError")
+							return;
+
+						std::cout << c.function->name() << "(";
+						for (size_t i = 0; i < c.parameters.size(); i ++)
+						{
+							std::cout << c.parameters[i]->asString();
+							if (i < c.parameters.size() - 1)
+								std::cout << ", ";
+						}
+						std::cout << ")";
+
+						if (c.returnValue)
+							std::cout << " -> " << c.returnValue->asString();
+						std::cout << std::endl;
+
+						const auto err = gl::glGetError();
+						if (err != gl::GL_NO_ERROR)
+							std::cout << "GL error: " << err << std::endl;
 					}
-					std::cout << ")";
-
-					if (c.returnValue)
-						std::cout << " -> " << c.returnValue->asString();
-					std::cout << std::endl;
-
-					const auto err = gl::glGetError();
-					if (err != gl::GL_NO_ERROR)
-						std::cout << "GL error: " << err << std::endl;
 				}
 			);
 
-			//gl::glEnable(gl::GL_CULL_FACE);
-			//gl::glEnable(gl::GL_DEPTH_TEST);
-			//gl::glDepthFunc(gl::GL_LESS);
+			gl::glEnable(gl::GL_CULL_FACE);
+			gl::glEnable(gl::GL_DEPTH_TEST);
+			gl::glDepthFunc(gl::GL_LESS);
 		}
 	};
 }
