@@ -1,5 +1,5 @@
-#ifndef VAST_HPP_GFX_SHADER
-#define VAST_HPP_GFX_SHADER
+#ifndef VAST_HPP_GFX_RES_SHADER
+#define VAST_HPP_GFX_RES_SHADER
 
 // Local
 #include <util/result.hpp>
@@ -14,7 +14,7 @@
 #include <sstream>
 #include <iostream>
 
-namespace vast::gfx
+namespace vast::gfx::res
 {
 	struct Shader
 	{

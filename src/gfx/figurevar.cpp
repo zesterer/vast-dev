@@ -32,17 +32,17 @@ namespace vast::gfx
 		// Create the figure pipeline if needed
 		if (!pipeline_initiated)
 		{
-			auto shader_r = Shader::from_files("data/shader/vert.glsl", "data/shader/frag.glsl");
+			auto shader_r = res::Shader::from_files("data/shader/vert.glsl", "data/shader/frag.glsl");
 
 			if (shader_r.is_failure())
 				util::panic("Could not create figure pipeline shader");
 
 			figure_pipeline = Pipeline(
-				InputFormat({
-					{DataType::F32, 3}, // Position
-					{DataType::F32, 3}, // Color
-					{DataType::F32, 3}, // Normal
-					{DataType::F32, 2}, // UVs
+				res::Format({
+					{res::FormatType::F32, 3}, // Position
+					{res::FormatType::F32, 3}, // Color
+					{res::FormatType::F32, 3}, // Normal
+					{res::FormatType::F32, 2}, // UVs
 				}),
 				shader_r.get_data(),
 				Target()

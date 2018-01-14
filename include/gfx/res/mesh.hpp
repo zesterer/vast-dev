@@ -6,6 +6,7 @@
 
 // Lib
 #include <glm/glm.hpp>
+#include <glbinding/gl/types.h>
 
 // Std
 #include <string>
@@ -153,6 +154,9 @@ namespace vast::gfx::res
 		size_t size() { return this->_polys.size(); }
 
 		void add(Poly p) { this->_polys.push_back(p); }
+
+		// TODO: Make this nicer
+		gl::GLfloat const* get_data() { return reinterpret_cast<gl::GLfloat*>(&this->_polys[0]); }
 
 		Mesh() {}
 		Mesh(OBJMesh& objmesh)

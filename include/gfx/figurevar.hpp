@@ -35,6 +35,12 @@ namespace vast::gfx
 
 		Figure(Pipeline& pipeline) : pipeline(pipeline)
 		{
+			auto mesh_r = res::Mesh::from("data/mesh/craft.obj");
+			if (mesh_r.is_success())
+				this->mesh = mesh_r.get_data();
+			else
+				util::panic("Could not load mesh");
+
 			std::cout << "Created Figure" << std::endl;
 		}
 

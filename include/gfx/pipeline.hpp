@@ -2,7 +2,8 @@
 #define VAST_HPP_GFX_PIPELINE
 
 // Local
-#include <gfx/shader.hpp>
+#include <gfx/res/format.hpp>
+#include <gfx/res/shader.hpp>
 
 // Std
 #include <string>
@@ -10,15 +11,6 @@
 
 namespace vast::gfx
 {
-	enum class DataType { F32, I32 };
-
-	struct InputFormat
-	{
-		std::vector<std::pair<DataType, int>> items;
-
-		InputFormat(std::initializer_list<std::pair<DataType, int>> items) : items(items) {}
-	};
-
 	struct Target
 	{
 		// Nothing yet
@@ -26,16 +18,16 @@ namespace vast::gfx
 
 	struct Pipeline
 	{
-		InputFormat input_format;
-		Shader shader;
+		res::Format format;
+		res::Shader shader;
 		Target target;
 
 		Pipeline(
-			InputFormat input_format,
-			Shader shader,
+			res::Format format,
+			res::Shader shader,
 			Target target
 		) :
-			input_format(input_format),
+			format(format),
 			shader(shader),
 			target(target)
 		{}

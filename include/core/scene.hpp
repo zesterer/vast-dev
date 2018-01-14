@@ -42,7 +42,7 @@ namespace vast::core
 		void setup()
 		{
 			// Create a few test objects
-			for (size_t i = 0; i < 10; i ++)
+			for (size_t i = 0; i < 3; i ++)
 				this->create_object(gfx::FIGURE_VARIANT_ID);
 		}
 
