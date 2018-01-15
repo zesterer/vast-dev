@@ -40,6 +40,11 @@ namespace vast::util
 		T const& operator*() { return this->get_data(); }
 		T const* operator->() { return &this->get_data(); }
 
+		T const& data_or(T const& alternative)
+		{
+			return this->good() ? this->get_data() : alternative;
+		}
+
 		E const& get_error(const char* file = __FILE__, int line = __LINE__) const
 		{
 			if (this->good())

@@ -29,10 +29,23 @@ namespace vast::gfx
 
 			//this->mat = this->_ori * this->mat; // <--- Not this!
 
-			this->vmat = glm::translate(glm::mat4(1), this->_pos);
-			this->vmat *= glm::mat4_cast(this->_ori); // TODO: Should this be converted to matrix first?
+			this->vmat = glm::mat4(1);
 
-			this->pmat = glm::perspective(this->_fov, this->_sr, std::numeric_limits<float>::min(), 1.0f);
+			//this->vmat = glm::rotate(this->vmat, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)); // Yaw
+
+			// Transform to standard coordinate space
+			//this->vmat = glm::rotate(this->vmat, glm::radians(-40.0f), glm::vec3(0.0, 1.0, 0.0));
+			//this->vmat = glm::rotate(this->vmat, glm::radians(-90.0f), glm::vec3(0.0, 0.0, 1.0));
+
+			this->vmat = glm::rotate(this->vmat, glm::radians(+90.0f), glm::vec3(0.0, 1.0, 0.0));
+			this->vmat = glm::rotate(this->vmat, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+
+			this->vmat = this->vmat * glm::inverse(glm::mat4_cast(this->_ori));
+			this->vmat = glm::translate(this->vmat, -this->_pos);
+
+			//this->vmat = glm::inverse(this->vmat);
+
+			this->pmat = glm::perspective(glm::radians(this->_fov), this->_sr, std::numeric_limits<float>::min(), 1.0f);
 		}
 
 		void set_view(View const& view)

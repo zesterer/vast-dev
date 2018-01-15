@@ -35,11 +35,12 @@ namespace vast::gfx
 
 			// Create a camera for the current frame, and update according to camera entity
 			Camera cam(90.0f);
-			if (auto entity = core::engine::entity_get(scene.croot, scene.camera))
+			cam.set_view(view);
+			if (auto entity = core::engine::entity_get(scene.croot, scene.cam))
 				cam.update_from(**entity);
 
 			// Clear the screen ready for the next frame of rendering
-			this->clear();
+			this->clear(glm::vec3(0, 0, 0.1));
 
 			// Render each figure object in the scene
 			render_figures(scene, cam);

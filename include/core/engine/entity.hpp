@@ -18,11 +18,14 @@ namespace vast::core::engine
 	// A structure defining the layout and features of the entity component
 	struct Entity
 	{
-		glm::vec3 pos, vel, scale;
+		glm::vec3 pos, vel, scale = glm::vec3(1);
 		glm::quat ori, rot;
 
 		void tick(float dt)
 		{
+			glm::normalize(this->ori);
+			glm::normalize(this->rot);
+
 			this->pos += this->vel * dt; // Apply velocity
 			this->ori = (this->rot * dt) * this->ori; // Apply rotation
 		}

@@ -68,7 +68,7 @@ namespace vast::core
 					c.create(*this, id);
 		}
 
-		//
+		// Tick all components in this root
 		void call_tick(float dt)
 		{
 			// Tick components
@@ -113,9 +113,16 @@ namespace vast::core
 		}
 
 		template <typename ... Args>
-		void emplace(core::ComponentRoot const& root, id_t id, Args ... args)
+		bool emplace(core::ComponentRoot const& root, id_t id, Args ... args)
 		{
-			this->_items[root.id][id] = std::make_shared<T>(args ...);
+			auto it = this->_items[root.id].find(root.id);
+			if (it == this->_items[root.id].end())
+			{
+				this->_items[root.id][id] = std::make_shared<T>(args ...);
+				return true;
+			}
+			else
+				return false;
 		}
 
 		void remove(ComponentRoot const& root, id_t id)

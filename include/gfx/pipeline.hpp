@@ -28,7 +28,7 @@ namespace vast::gfx
 
 	struct Pipeline
 	{
-		enum class Error { NO_SUCH_UNIFORM };
+		enum class Error { NO_SUCH_UNIFORM, INVALID_UNIFORM };
 
 		res::Shader shader;
 		Target target;
@@ -50,8 +50,24 @@ namespace vast::gfx
 
 		util::Status<Error> set_uniform(Uniform uniform, float f)
 		{
-			gl::glUniform1f(uniform.gl_id, f);
-			return util::Status<Error>::success();
+			if (uniform.gl_id == -1)
+				return util::Status<Error>::failure(Error::INVALID_UNIFORM);
+			else
+			{
+				gl::glUniform1f(uniform.gl_id, f);
+				return util::Status<Error>::success();
+			}
+		}
+
+		util::Status<Error> set_uniform(Uniform uniform, glm::mat4 const& m)
+		{
+			if (uniform.gl_id == -1)
+				return util::Status<Error>::failure(Error::INVALID_UNIFORM);
+			else
+			{
+				gl::glUniformMatrix4fv(uniform.gl_id, 1, gl::GL_FALSE, &m[0][0]);
+				return util::Status<Error>::success();
+			}
 		}
 
 		Pipeline(

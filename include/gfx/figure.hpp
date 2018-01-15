@@ -35,43 +35,46 @@ namespace vast::gfx
 			this->mat = glm::scale(this->mat, entity->scale);
 		}
 
-		void render()
-		{
-			this->model.bind();
-
-			gl::glDrawArrays(this->model.gl_primitive, 0, this->model.vertex_count);
-		}
+		void render(Pipeline& pipeline);
 
 		Figure()
 		{
-			res::Mesh m;
-			m.add({
-				res::Poly(
-					res::Vert(glm::vec3(1, -1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-					res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-					res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
-				),
-				res::Poly(
-					res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-					res::Vert(glm::vec3(-1, 1, -0.5), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-					res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
-				)
-			});
+			// res::Mesh m;
+			// m.add({
+			// 	res::Poly(
+			// 		res::Vert(glm::vec3(1, -1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+			// 		res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+			// 		res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
+			// 	),
+			// 	res::Poly(
+			// 		res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+			// 		res::Vert(glm::vec3(-1, 1, -0.5), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
+			// 		res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
+			// 	)
+			// });
+            //
+			// this->model = res::Model(m,
+			// 	gl::GL_TRIANGLES,
+			// 	{
+			// 		{ "vert_pos", FormatType::F32, 3 }, // Position
+			// 		{ "vert_color", FormatType::F32, 3 }, // Color
+			// 		{ "vert_norm", FormatType::F32, 3 }, // Normal
+			// 		{ "vert_uv", FormatType::F32, 2 }, // UVs
+			// 	}
+			// );
 
-			this->model = res::Model(m,
-				gl::GL_TRIANGLES,
-				{
-					{ "vert_pos", FormatType::F32, 3 }, // Position
-					{ "vert_color", FormatType::F32, 3 }, // Color
-					{ "vert_norm", FormatType::F32, 3 }, // Normal
-					{ "vert_uv", FormatType::F32, 2 }, // UVs
-				}
-			);
-
-			// if (auto mesh = res::Mesh::from("data/mesh/craft.obj"))
-			// 	this->model = res::Model(*mesh);
-			// else
-			// 	util::panic("Could not load mesh");
+			if (auto mesh = res::Mesh::from("data/mesh/craft.obj"))
+				this->model = res::Model(*mesh,
+					gl::GL_TRIANGLES,
+					{
+						{ "vert_pos", FormatType::F32, 3 }, // Position
+						{ "vert_color", FormatType::F32, 3 }, // Color
+						{ "vert_norm", FormatType::F32, 3 }, // Normal
+						{ "vert_uv", FormatType::F32, 2 }, // UVs
+					}
+				);
+			else
+				util::panic("Could not load mesh");
 
 			std::cout << "Created Figure" << std::endl;
 		}

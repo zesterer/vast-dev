@@ -23,7 +23,11 @@ namespace vast::gfx
 
 	// The pipeline and uniforms used for all figures
 	static std::optional<Pipeline> figure_pipeline;
-	static std::optional<Uniform> uni_time;
+	static std::optional<Uniform>
+		uni_time,
+		uni_mmat,
+		uni_vmat,
+		uni_pmat;
 
 	// Initiate the figure variant
 	void figure_init(core::ComponentRoot& root)
@@ -41,10 +45,11 @@ namespace vast::gfx
 			else
 				util::panic("Could not create figure pipeline shader");
 
-			if (auto uni = figure_pipeline->get_uniform("uni_time"))
-				uni_time = *uni;
-			else
-				util::panic("Could not get 'uni_time' location in figure pipeline shader");
+			// Find uniform indexes
+			uni_time = figure_pipeline->get_uniform("uni_time").data_or(Uniform(-1));
+			uni_mmat = figure_pipeline->get_uniform("uni_mmat").data_or(Uniform(-1));
+			uni_vmat = figure_pipeline->get_uniform("uni_vmat").data_or(Uniform(-1));
+			uni_pmat = figure_pipeline->get_uniform("uni_pmat").data_or(Uniform(-1));
 		}
 	}
 
@@ -85,10 +90,12 @@ namespace vast::gfx
 		// Set the pipeline up for figure rendering
 		figure_pipeline->bind();
 		figure_pipeline->set_uniform(*uni_time, scene.time);
+		figure_pipeline->set_uniform(*uni_vmat, cam.vmat);
+		figure_pipeline->set_uniform(*uni_pmat, cam.pmat);
 
 		// Render each figure
 		for (auto pair : figures.components(scene.croot))
-			pair.second->render();
+			pair.second->render(*figure_pipeline);
 	}
 
 	// Create an instance describing the figure variant
@@ -101,6 +108,15 @@ namespace vast::gfx
 			&figure_remove,
 			&figure_tick
 		);
+	}
+
+	void Figure::render(Pipeline& pipeline)
+	{
+		pipeline.set_uniform(*uni_mmat, this->mat);
+
+		this->model.bind();
+
+		gl::glDrawArrays(this->model.gl_primitive, 0, this->model.vertex_count);
 	}
 
 	// Register the figure as a component variant
