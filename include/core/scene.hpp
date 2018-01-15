@@ -4,7 +4,6 @@
 // Local
 #include <core/cm.hpp>
 #include <core/engine/entity.hpp>
-#include <gfx/figure.hpp>
 
 // Std
 #include <vector>
@@ -15,9 +14,11 @@ namespace vast::core
 {
 	struct Scene
 	{
-		float _time;
+		float time;
 		ComponentRoot croot;
 		std::vector<id_t> _objects;
+
+		id_t camera;
 
 		std::vector<id_t> const& get_objects() const
 		{
@@ -30,7 +31,7 @@ namespace vast::core
 		void tick(float dt)
 		{
 			this->croot.call_tick(dt);
-			this->_time += dt;
+			this->time += dt;
 		}
 
 		id_t create_object(int variant)
@@ -47,11 +48,11 @@ namespace vast::core
 			this->croot.call_remove(id);
 		}
 
-		void setup()
+		void setup(int figure_variant)
 		{
 			// Create a few test objects
 			for (size_t i = 0; i < 1; i ++)
-				this->create_object(gfx::FIGURE_VARIANT_ID);
+				this->create_object(figure_variant);
 		}
 
 		void clear()
@@ -64,7 +65,7 @@ namespace vast::core
 			}
 		}
 
-		Scene() : _time(0.0f) {}
+		Scene() : time(0.0f) {}
 
 		~Scene()
 		{

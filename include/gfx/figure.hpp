@@ -3,10 +3,12 @@
 
 // Local
 #include <core/cm.hpp>
+#include <core/scene.hpp>
 #include <core/engine/entity.hpp>
 #include <util/result.hpp>
 #include <gfx/res/mesh.hpp>
 #include <gfx/res/model.hpp>
+#include <gfx/camera.hpp>
 #include <gfx/pipeline.hpp>
 
 // Lib
@@ -25,16 +27,22 @@ namespace vast::gfx
 	{
 		glm::mat4 mat;
 		res::Model model;
-		Pipeline& pipeline;
 
 		void update_from(std::shared_ptr<core::engine::Entity> entity)
 		{
 			this->mat = glm::translate(glm::mat4(1), entity->pos);
-			this->mat *= glm::mat4_cast(entity->ori); // Should this be converted to matrix first?
+			this->mat *= glm::mat4_cast(entity->ori); // TODO: Should this be converted to matrix first?
 			this->mat = glm::scale(this->mat, entity->scale);
 		}
 
-		Figure(Pipeline& pipeline) : pipeline(pipeline)
+		void render()
+		{
+			this->model.bind();
+
+			gl::glDrawArrays(this->model.gl_primitive, 0, this->model.vertex_count);
+		}
+
+		Figure()
 		{
 			res::Mesh m;
 			m.add({
@@ -77,20 +85,16 @@ namespace vast::gfx
 	// A box containing all figures
 	extern core::ComponentBox<Figure> figures;
 
-	// Possible errors when attempting to manipulate figures
-	enum class FigureError { INVALID_ROOT, NOT_A_FIGURE };
-
 	// Get a reference to a figure, given a component root and an object id
 	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot const& root, id_t id);
 
-	// Create a new figure component
+	// Figure manipulation
 	void figure_create(core::ComponentRoot& root, id_t id);
-
-	// Remove a figure component
 	void figure_remove(core::ComponentRoot& root, id_t id);
-
-	// Perform a tick on all figure components
 	void figure_tick(core::ComponentRoot& root, float dt);
+
+	// Render all figures
+	void render_figures(core::Scene const& scene, Camera const& cam);
 
 	// Create an instance describing the figure variant
 	core::ComponentVariant figure_variant();

@@ -4,6 +4,7 @@
 // Local
 #include <util/panic.hpp>
 #include <util/result.hpp>
+#include <gfx/view.hpp>
 
 // Lib
 #define GLFW_INCLUDE_NONE
@@ -15,6 +16,10 @@ namespace vast::ui
 	struct Win
 	{
 		GLFWwindow* _gwin;
+		gfx::View view;
+
+		static void add_callbacks_for(Win& win);
+		static void remove_callbacks_for(Win& win);
 
 		bool is_open()
 		{
@@ -31,13 +36,16 @@ namespace vast::ui
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-			if ((this->_gwin = glfwCreateWindow(800, 500, "Window", nullptr, nullptr)) == nullptr)
+			if ((this->_gwin = glfwCreateWindow(this->view.width, this->view.height, "Window", nullptr, nullptr)) == nullptr)
 				util::panic("Failed to create GLFW window");
 
 			// TODO : Report OpenGL version
 			//int gl_maj = glfwGetWindowAttrib(this->_gwin, GLFW_CONTEXT_VERSION_MAJOR);
 			//int gl_min = glfwGetWindowAttrib(this->_gwin, GLFW_CONTEXT_VERSION_MINOR);
 			//int gl_prof = glfwGetWindowAttrib(this->_gwin, GLFW_OPENGL_PROFILE);
+
+			// Set window callbacks
+			Win::add_callbacks_for(*this);
 
 			glfwMakeContextCurrent(this->_gwin);
 		}
@@ -68,16 +76,25 @@ namespace vast::ui
 
 		void close()
 		{
-			if (this->_gwin != nullptr)
-			{
-				glfwDestroyWindow(this->_gwin);
-				this->_gwin = nullptr;
-			}
+			glfwSetWindowShouldClose(this->_gwin, GLFW_TRUE);
 		}
+
+		void resize_event(int w, int h)
+		{
+			this->view.width = w;
+			this->view.height = h;
+		}
+
+		Win() : view(gfx::View(800, 500)) {}
 
 		~Win()
 		{
-			this->close();
+			if (this->_gwin != nullptr)
+			{
+				Win::remove_callbacks_for(*this);
+				glfwDestroyWindow(this->_gwin);
+				this->_gwin = nullptr;
+			}
 		}
 	};
 }

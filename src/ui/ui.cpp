@@ -1,4 +1,5 @@
 // Local
+#include <ui/win.hpp>
 #include <util/panic.hpp>
 
 // Lib

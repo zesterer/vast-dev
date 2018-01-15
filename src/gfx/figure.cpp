@@ -21,8 +21,9 @@ namespace vast::gfx
 		return figures.get(root, id);
 	}
 
-	// The pipeline used for all figures by default
-	std::optional<Pipeline> figure_pipeline;
+	// The pipeline and uniforms used for all figures
+	static std::optional<Pipeline> figure_pipeline;
+	static std::optional<Uniform> uni_time;
 
 	// Initiate the figure variant
 	void figure_init(core::ComponentRoot& root)
@@ -39,6 +40,11 @@ namespace vast::gfx
 				);
 			else
 				util::panic("Could not create figure pipeline shader");
+
+			if (auto uni = figure_pipeline->get_uniform("uni_time"))
+				uni_time = *uni;
+			else
+				util::panic("Could not get 'uni_time' location in figure pipeline shader");
 		}
 	}
 
@@ -49,7 +55,7 @@ namespace vast::gfx
 		core::engine::entity_create(root, id);
 
 		if (figure_pipeline)
-			figures.emplace(root, id, std::ref(*figure_pipeline));
+			figures.emplace(root, id);
 		else
 			util::panic("Tried to initiate Figure without first creating figure pipeline");
 	}
@@ -66,13 +72,23 @@ namespace vast::gfx
 		(void)dt;
 
 		for (auto pair : figures.components(root))
-		{
-			Figure& figure = *pair.second;
+			if (auto entity = core::engine::entity_get(root, pair.first)) // Update figure from entity
+				pair.second->update_from(*entity);
+	}
 
-			// Update the figure component matrices from the entity component
-			if (auto entity = core::engine::entity_get(root, pair.first))
-				figure.update_from(*entity);
-		}
+	// Render all figures
+	void render_figures(core::Scene const& scene, Camera const& cam)
+	{
+		if (!figure_pipeline) // Only continue if the figure pipeline has been configured
+			return;
+
+		// Set the pipeline up for figure rendering
+		figure_pipeline->bind();
+		figure_pipeline->set_uniform(*uni_time, scene.time);
+
+		// Render each figure
+		for (auto pair : figures.components(scene.croot))
+			pair.second->render();
 	}
 
 	// Create an instance describing the figure variant

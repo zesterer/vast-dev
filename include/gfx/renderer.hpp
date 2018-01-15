@@ -3,7 +3,10 @@
 
 // Local
 #include <core/scene.hpp>
+#include <core/engine/entity.hpp>
 #include <gfx/figure.hpp>
+#include <gfx/camera.hpp>
+#include <gfx/view.hpp>
 
 // Lib
 #include <glbinding/Binding.h>
@@ -15,36 +18,31 @@ namespace vast::gfx
 	struct Renderer
 	{
 		// Clear the screen of existing features ready for a new frame
-		void clear(glm::vec3 color = glm::vec3(1, 1, 1))
+		void clear(glm::vec3 color = glm::vec3(0, 0, 0))
 		{
 			gl::glClearColor(color.r, color.g, color.b, 1.0);
 			gl::glClear(gl::GL_COLOR_BUFFER_BIT | gl::GL_DEPTH_BUFFER_BIT);
 		}
 
-		// Render a figure
-		void render_figure(Figure const& figure)
-		{
-			figure.pipeline.bind();
-			figure.model.bind();
-
-			gl::glDrawArrays(figure.model.gl_primitive, 0, figure.model.vertex_count);
-		}
-
 		// Render a scene to the screen
-		void render(core::Scene const& scene)
+		void render(core::Scene const& scene, View const& view)
 		{
 			// Use the current context for rendering (TODO: Switch context based on window?)
 			glbinding::Binding::useCurrentContext();
+
+			// Size the viewport appropriately
+			gl::glViewport(0, 0, view.width, view.height);
+
+			// Create a camera for the current frame, and update according to camera entity
+			Camera cam(90.0f);
+			if (auto entity = core::engine::entity_get(scene.croot, scene.camera))
+				cam.update_from(**entity);
 
 			// Clear the screen ready for the next frame of rendering
 			this->clear();
 
 			// Render each figure object in the scene
-			for (id_t obj : scene.get_objects())
-			{
-				if (auto figure = figure_get(scene.get_croot(), obj))
-					render_figure(**figure);
-			}
+			render_figures(scene, cam);
 		}
 
 		Renderer()

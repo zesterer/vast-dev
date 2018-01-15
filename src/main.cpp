@@ -24,7 +24,7 @@ namespace vast
 		scene.get_croot().add_variant(gfx::figure_variant());
 
 		// Set up scene
-		scene.setup();
+		scene.setup(gfx::FIGURE_VARIANT_ID);
 
 		// Game loop
 		while (win.is_open())
@@ -36,7 +36,7 @@ namespace vast
 			scene.tick(1.0f);
 
 			// Render the scene to the screen
-			renderer.render(scene);
+			renderer.render(scene, win.view);
 
 			// Display the contents of the scene
 			win.display().except("Could not display window contents");
