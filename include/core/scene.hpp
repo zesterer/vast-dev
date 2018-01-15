@@ -3,7 +3,9 @@
 
 // Local
 #include <core/cm.hpp>
-#include <core/engine/entity.hpp>
+
+// Lib
+#include <glm/glm.hpp>
 
 // Std
 #include <vector>
@@ -28,18 +30,9 @@ namespace vast::core
 		ComponentRoot const& get_croot() const { return this->croot; }
 		ComponentRoot& get_croot() { return this->croot; }
 
-		void tick(float dt)
-		{
-			if (auto entity = engine::entity_get(this->croot, this->cam))
-			{
-				float per = this->time * 0.01f;
-				(*entity)->pos = glm::vec3(-glm::cos(per), glm::sin(per), 0) * 10.0f;
-				(*entity)->ori = glm::rotate(glm::quat(), -per, glm::vec3(0, 0, 1));
-			}
+		template <typename T> T* get(id_t id);
 
-			this->croot.call_tick(dt);
-			this->time += dt;
-		}
+		void tick(float dt);
 
 		id_t create_object(int variant)
 		{
@@ -55,14 +48,7 @@ namespace vast::core
 			this->croot.call_remove(id);
 		}
 
-		void setup(int figure_variant)
-		{
-			// Create a camera
-			this->cam = this->create_object(engine::ENTITY_VARIANT_ID);
-
-			for (size_t i = 0; i < 1; i ++)
-				this->create_object(figure_variant);
-		}
+		void setup(int figure_variant);
 
 		void clear()
 		{

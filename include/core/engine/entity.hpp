@@ -7,6 +7,7 @@
 
 // Local
 #include <core/cm.hpp>
+#include <core/scene.hpp>
 #include <util/result.hpp>
 
 // Std
@@ -54,6 +55,11 @@ namespace vast::core::engine
 
 	// Create an instance describing the entity variant
 	ComponentVariant entity_variant();
+}
+
+namespace vast::core
+{
+	template <> engine::Entity* Scene::get<engine::Entity>(id_t id);
 }
 
 #endif

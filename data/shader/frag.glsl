@@ -12,6 +12,5 @@ out vec4 color;
 void main()
 {
 	color = vec4(frag_color, 1.0);
-
 	color = floor(color * 10.0) / 10.0;
 }

@@ -1,5 +1,6 @@
 // Local
 #include <core/engine/entity.hpp>
+#include <core/scene.hpp>
 
 namespace vast::core::engine
 {
@@ -57,5 +58,17 @@ namespace vast::core::engine
 	__attribute__((constructor)) void register_entity_var()
 	{
 		ENTITY_VARIANT_ID = cm_register_component();
+	}
+}
+
+namespace vast::core
+{
+	template <> engine::Entity* Scene::get<engine::Entity>(id_t id)
+	{
+		auto entity = engine::entity_get(this->croot, id);
+		if (entity)
+			return &**entity;
+		else
+			return nullptr;
 	}
 }
