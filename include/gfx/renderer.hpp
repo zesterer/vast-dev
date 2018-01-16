@@ -3,7 +3,7 @@
 
 // Local
 #include <core/scene.hpp>
-#include <core/engine/entity.hpp>
+#include <engine/entity.hpp>
 #include <gfx/figure.hpp>
 #include <gfx/camera.hpp>
 #include <gfx/view.hpp>
@@ -36,7 +36,7 @@ namespace vast::gfx
 			// Create a camera for the current frame, and update according to camera entity
 			Camera cam(90.0f);
 			cam.set_view(view);
-			if (auto entity = scene.get<core::engine::Entity>(scene.cam))
+			if (auto entity = core::Component<engine::Entity>::get(scene, scene.cam))
 				cam.update_from(*entity);
 
 			// Clear the screen ready for the next frame of rendering

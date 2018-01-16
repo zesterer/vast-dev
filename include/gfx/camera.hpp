@@ -3,7 +3,7 @@
 
 // Local
 #include <gfx/view.hpp>
-#include <core/engine/entity.hpp>
+#include <engine/entity.hpp>
 
 // Lib
 #include <glm/glm.hpp>
@@ -60,7 +60,7 @@ namespace vast::gfx
 			this->update();
 		}
 
-		void update_from(core::engine::Entity const& entity)
+		void update_from(engine::Entity const& entity)
 		{
 			this->_pos = entity.pos;
 			this->_ori = entity.ori;

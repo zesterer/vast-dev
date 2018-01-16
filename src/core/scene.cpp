@@ -1,12 +1,17 @@
 // Local
 #include <core/scene.hpp>
-#include <core/engine/entity.hpp>
+#include <engine/entity.hpp>
 #include <gfx/figure.hpp>
 
 namespace vast::core
 {
+	int Scene::_scene_counter = 0;
+
 	void Scene::setup()
 	{
+		for (auto call : this->calls)
+			call.init(*this);
+
 		// Create a camera
 		this->cam = this->create<engine::Entity>();
 
@@ -25,14 +30,17 @@ namespace vast::core
 			cam->ori = glm::rotate(glm::quat(), -per, glm::vec3(0, 0, 1));
 		}
 
-		this->croot.call_tick(dt);
+		for (auto call : this->calls)
+			call.tick(*this, dt);
+
+		//this->croot.call_tick(dt);
 		this->time += dt;
 	}
 
 	void Scene::clear()
 	{
 		// Remove all objects from the scene
-		for (auto iter = this->croot.ids.begin(); iter != this->croot.ids.end(); ++iter)
-			this->croot.call_remove(*iter);
+		for (auto id : this->objects)
+			this->remove(id);
 	}
 }

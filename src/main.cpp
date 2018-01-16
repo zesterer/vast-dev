@@ -1,7 +1,7 @@
 // Local
 #include <ui/win.hpp>
 #include <core/scene.hpp>
-#include <core/engine/entity.hpp>
+#include <engine/entity.hpp>
 #include <gfx/renderer.hpp>
 #include <gfx/figure.hpp>
 
@@ -20,8 +20,8 @@ namespace vast
 		gfx::Renderer renderer;
 
 		// Add component variants to the scene
-		scene.croot.add_variant(core::engine::entity_variant());
-		scene.croot.add_variant(gfx::figure_variant());
+		scene.calls.push_back(core::Component<engine::Entity>::get_calls());
+		scene.calls.push_back(core::Component<gfx::Figure>::get_calls());
 
 		// Set up scene
 		scene.setup();

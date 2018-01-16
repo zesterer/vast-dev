@@ -2,9 +2,8 @@
 #define VAST_HPP_GFX_FIGURE
 
 // Local
-#include <core/cm.hpp>
 #include <core/scene.hpp>
-#include <core/engine/entity.hpp>
+#include <engine/entity.hpp>
 #include <util/result.hpp>
 #include <gfx/res/mesh.hpp>
 #include <gfx/res/model.hpp>
@@ -22,17 +21,16 @@
 
 namespace vast::gfx
 {
-	// A figure is any entity that has an associated 3D model, texture, and optional normal map
 	struct Figure
 	{
 		glm::mat4 mat;
 		res::Model model;
 
-		void update_from(std::shared_ptr<core::engine::Entity> entity)
+		void update_from(engine::Entity& entity)
 		{
-			this->mat = glm::translate(glm::mat4(1), entity->pos);
-			this->mat *= glm::mat4_cast(entity->ori); // TODO: Should this be converted to matrix first?
-			this->mat = glm::scale(this->mat, entity->scale);
+			this->mat = glm::translate(glm::mat4(1), entity.pos);
+			this->mat *= glm::mat4_cast(entity.ori); // TODO: Should this be converted to matrix first?
+			this->mat = glm::scale(this->mat, entity.scale);
 		}
 
 		void render(Pipeline& pipeline);
@@ -84,27 +82,18 @@ namespace vast::gfx
 		~Figure() { std::cout << "Deleted Figure" << std::endl; }
 	};
 
-	// Used to store the unique variant id for models
-	extern int FIGURE_VARIANT_ID;
-
-	// A box containing all figures
-	extern core::ComponentBox<Figure> figures;
-
-	// Figure manipulation
-	void figure_remove(core::ComponentRoot& root, id_t id);
-	void figure_tick(core::ComponentRoot& root, float dt);
-
 	// Render all figures
 	void render_figures(core::Scene const& scene, Camera const& cam);
-
-	// Create an instance describing the figure variant
-	core::ComponentVariant figure_variant();
 }
 
 namespace vast::core
 {
-	template <> gfx::Figure* Scene::get<gfx::Figure>(id_t id);
-	template <> id_t Scene::create<gfx::Figure>();
+	using namespace gfx;
+
+	template<> void Component<Figure>::init(Scene& scene);
+	template<> id_t Component<Figure>::create(Scene& scene);
+	template<> void Component<Figure>::remove(Scene& scene, id_t id);
+	template<> void Component<Figure>::tick(Scene& scene, float dt);
 }
 
 #endif
