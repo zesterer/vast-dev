@@ -14,7 +14,7 @@ namespace vast::gfx
 {
 	enum class FormatType { F32, I32 };
 
-	void bind_format_attributes(gl::GLuint vao_gl_id, std::initializer_list<std::tuple<std::string, FormatType, int>> attrs);
+	void bind_format_attributes(res::Shader const& shader, gl::GLuint vao_gl_id, std::initializer_list<std::tuple<std::string, FormatType, int>> attrs);
 }
 
 #endif

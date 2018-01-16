@@ -37,7 +37,7 @@ namespace vast::gfx
 
 		void render(Pipeline& pipeline);
 
-		Figure()
+		Figure(Pipeline& pipeline)
 		{
 			// res::Mesh m;
 			// m.add({
@@ -64,7 +64,9 @@ namespace vast::gfx
 			// );
 
 			if (auto mesh = res::Mesh::from("data/mesh/craft.obj"))
-				this->model = res::Model(*mesh,
+				this->model = res::Model(
+					pipeline,
+					*mesh,
 					gl::GL_TRIANGLES,
 					{
 						{ "vert_pos", FormatType::F32, 3 }, // Position
@@ -88,11 +90,7 @@ namespace vast::gfx
 	// A box containing all figures
 	extern core::ComponentBox<Figure> figures;
 
-	// Get a reference to a figure, given a component root and an object id
-	util::Result<std::shared_ptr<Figure>, core::ComponentError> figure_get(core::ComponentRoot const& root, id_t id);
-
 	// Figure manipulation
-	void figure_create(core::ComponentRoot& root, id_t id);
 	void figure_remove(core::ComponentRoot& root, id_t id);
 	void figure_tick(core::ComponentRoot& root, float dt);
 
@@ -101,6 +99,12 @@ namespace vast::gfx
 
 	// Create an instance describing the figure variant
 	core::ComponentVariant figure_variant();
+}
+
+namespace vast::core
+{
+	template <> gfx::Figure* Scene::get<gfx::Figure>(id_t id);
+	template <> id_t Scene::create<gfx::Figure>();
 }
 
 #endif

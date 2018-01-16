@@ -3,6 +3,7 @@
 
 // Local
 #include <gfx/res/mesh.hpp>
+#include <gfx/pipeline.hpp>
 #include <gfx/format.hpp>
 #include <util/panic.hpp>
 
@@ -28,6 +29,7 @@ namespace vast::gfx::res
 
 		Model() : _valid(false), vertex_count(0) {}
 		Model(
+			Pipeline const& pipeline,
 			Mesh const& mesh,
 			gl::GLenum gl_primitive,
 			std::initializer_list<std::tuple<std::string, FormatType, int>> attrs
@@ -49,7 +51,7 @@ namespace vast::gfx::res
 			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * mesh.get_vertex_count(), mesh.get_data(), gl::GL_STATIC_DRAW);
 
 			// Bind format
-			bind_format_attributes(this->gl_id, attrs);
+			bind_format_attributes(pipeline.shader, this->gl_id, attrs);
 		}
 	};
 }

@@ -20,11 +20,11 @@ namespace vast
 		gfx::Renderer renderer;
 
 		// Add component variants to the scene
-		scene.get_croot().add_variant(core::engine::entity_variant());
-		scene.get_croot().add_variant(gfx::figure_variant());
+		scene.croot.add_variant(core::engine::entity_variant());
+		scene.croot.add_variant(gfx::figure_variant());
 
 		// Set up scene
-		scene.setup(gfx::FIGURE_VARIANT_ID);
+		scene.setup();
 
 		// Game loop
 		while (win.is_open())

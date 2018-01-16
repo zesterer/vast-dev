@@ -38,15 +38,15 @@ namespace vast::gfx::res
 	{
 		Vert v0, v1, v2;
 
-		Poly() {}
-		Poly(Vert v0, Vert v1, Vert v2) : v0(v0), v1(v1), v2(v2) {}
-
 		void compute_normal()
 		{
 			glm::vec3 n = glm::cross(this->v1.pos - this->v0.pos, this->v2.pos - this->v0.pos);
 			glm::normalize(n);
 			this->v0.norm = this->v1.norm = this->v2.norm = n;
 		}
+
+		Poly() {}
+		Poly(Vert v0, Vert v1, Vert v2) : v0(v0), v1(v1), v2(v2) {}
 	};
 
 	struct OBJMesh
@@ -80,6 +80,8 @@ namespace vast::gfx::res
 			if (ind[2].x >= 0) p.v0.norm = this->norms[ind[2].x];
 			if (ind[2].y >= 0) p.v1.norm = this->norms[ind[2].y];
 			if (ind[2].z >= 0) p.v2.norm = this->norms[ind[2].z];
+
+			p.v0.col = p.v1.col = p.v2.col = glm::vec3(1);
 
 			return p;
 		}
@@ -173,7 +175,12 @@ namespace vast::gfx::res
 		Mesh(OBJMesh& objmesh)
 		{
 			for (size_t i = 0; i < objmesh.size(); i ++)
-				this->add(objmesh.get_polygon(i));
+			{
+				// TODO: Remove this
+				auto p = objmesh.get_polygon(i);
+				p.compute_normal();
+				this->add(p);
+			}
 		}
 
 		static util::Result<Mesh, OBJMesh::Error> from(std::string const& filename)

@@ -4,7 +4,7 @@
 
 namespace vast::gfx
 {
-	void bind_format_attributes(gl::GLuint vao_gl_id, std::initializer_list<std::tuple<std::string, FormatType, int>> attrs)
+	void bind_format_attributes(res::Shader const& shader, gl::GLuint vao_gl_id, std::initializer_list<std::tuple<std::string, FormatType, int>> attrs)
 	{
 		// Calculate stride
 		size_t stride = 0;
@@ -26,19 +26,24 @@ namespace vast::gfx
 		size_t i = 0;
 		for (auto& attr : attrs)
 		{
-			gl::glEnableVertexAttribArray(i);
+			gl::GLint loc = gl::glGetAttribLocation(shader.gl_id, std::get<0>(attr).c_str());
 
-			// TODO: add more data types to this
-			switch(std::get<1>(attr))
+			if (loc != -1)
 			{
-			case FormatType::F32:
-				gl::glVertexAttribPointer(i, std::get<2>(attr), gl::GL_FLOAT, gl::GL_FALSE, stride, reinterpret_cast<void*>(offset));
-				offset += sizeof(gl::GLfloat) * std::get<2>(attr);
-				break;
-			default:
-				break;
+				gl::glEnableVertexAttribArray(loc);
+
+				// TODO: add more data types to this
+				switch(std::get<1>(attr))
+				{
+				case FormatType::F32:
+					gl::glVertexAttribPointer(loc, std::get<2>(attr), gl::GL_FLOAT, gl::GL_FALSE, stride, reinterpret_cast<void*>(offset));
+					break;
+				default:
+					break;
+				}
 			}
 
+			offset += sizeof(gl::GLfloat) * std::get<2>(attr);
 			i ++;
 		}
 	}

@@ -6,7 +6,8 @@
 
 // Std
 #include <functional>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 #include <memory>
 
 namespace vast::core
@@ -20,20 +21,18 @@ namespace vast::core
 	struct ComponentVariant
 	{
 		typedef std::function<void (ComponentRoot&)> init_func_t;
-		typedef std::function<void (ComponentRoot&, id_t)> create_func_t;
+		//typedef std::function<void (ComponentRoot&, id_t)> create_func_t;
 		typedef std::function<void (ComponentRoot&, id_t)> remove_func_t;
 		typedef std::function<void (ComponentRoot&, float)> tick_func_t;
 
 		int variant_id;
 		init_func_t init;
-		create_func_t create;
 		remove_func_t remove;
 		tick_func_t tick;
 
 		ComponentVariant(
 			int variant_id,
 			init_func_t init,
-			create_func_t create,
 			remove_func_t remove,
 			tick_func_t tick
 		);
@@ -43,7 +42,8 @@ namespace vast::core
 	struct ComponentRoot
 	{
 		cm_id id;
-		id_t _entity_id_counter;
+		id_t _object_id_counter;
+		std::unordered_set<id_t> ids;
 		std::vector<ComponentVariant> _types;
 
 		// Add a component variant to this class of objects
@@ -53,19 +53,11 @@ namespace vast::core
 			type.init(*this); // Init the variant
 		}
 
-		// Generate a new unique entity id
-		id_t new_entity_id()
+		// Generate a new unique object id
+		id_t new_object()
 		{
-			return ++this->_entity_id_counter;
-		}
-
-		// Create a new object of a specific variant id
-		void call_create(int variant, id_t id)
-		{
-			// Create object components (in order of component precedence)
-			for (ComponentVariant c : this->_types)
-				if (c.variant_id == variant)
-					c.create(*this, id);
+			this->ids.emplace(++this->_object_id_counter);
+			return this->_object_id_counter;
 		}
 
 		// Tick all components in this root
@@ -95,7 +87,7 @@ namespace vast::core
 	struct ComponentBox
 	{
 		// A hashmap containing all components of this variant (TODO: Replace the std::map with a more performant cache-friendly structure)
-		std::map<cm_id, std::map<id_t, std::shared_ptr<T>>> _items;
+		std::unordered_map<cm_id, std::unordered_map<id_t, std::shared_ptr<T>>> _items;
 
 		util::Result<std::shared_ptr<T>, ComponentError> get(ComponentRoot const& root, id_t id)
 		{
@@ -133,7 +125,7 @@ namespace vast::core
 		}
 
 		// TODO: This API SERIOUSLY needs improving, shouldn't just return map reference
-		std::map<id_t, std::shared_ptr<T>>& components(ComponentRoot const& root)
+		std::unordered_map<id_t, std::shared_ptr<T>>& components(ComponentRoot const& root)
 		{
 			return this->_items[root.id];
 		}

@@ -10,23 +10,11 @@ namespace vast::core::engine
 	// A box containing all entities
 	core::ComponentBox<Entity> entities;
 
-	// Get a reference to an entity, given a component root and an object id
-	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot const& root, id_t id)
-	{
-		return entities.get(root, id);
-	}
-
 	// Initiate the figure variant
 	void entity_init(core::ComponentRoot& root)
 	{
 		(void)root;
 		// Nothing yet
-	}
-
-	// Create a new entity component
-	void entity_create(ComponentRoot& root, id_t id)
-	{
-		entities.emplace(root, id);
 	}
 
 	// Remove an entity component
@@ -48,7 +36,6 @@ namespace vast::core::engine
 		return ComponentVariant(
 			ENTITY_VARIANT_ID,
 			&entity_init,
-			&entity_create,
 			&entity_remove,
 			&entity_tick
 		);
@@ -63,12 +50,23 @@ namespace vast::core::engine
 
 namespace vast::core
 {
-	template <> engine::Entity* Scene::get<engine::Entity>(id_t id)
+	using namespace engine;
+
+	template <> Entity* Scene::get<Entity>(id_t id)
 	{
-		auto entity = engine::entity_get(this->croot, id);
+		auto entity = entities.get(this->croot, id);
 		if (entity)
 			return &**entity;
 		else
 			return nullptr;
+	}
+
+	template <> id_t Scene::create<engine::Entity>()
+	{
+		id_t id = this->croot.new_object();
+
+		entities.emplace(this->croot, id);
+
+		return id;
 	}
 }

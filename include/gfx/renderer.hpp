@@ -25,7 +25,7 @@ namespace vast::gfx
 		}
 
 		// Render a scene to the screen
-		void render(core::Scene const& scene, View const& view)
+		void render(core::Scene& scene, View const& view)
 		{
 			// Use the current context for rendering (TODO: Switch context based on window?)
 			glbinding::Binding::useCurrentContext();
@@ -36,11 +36,11 @@ namespace vast::gfx
 			// Create a camera for the current frame, and update according to camera entity
 			Camera cam(90.0f);
 			cam.set_view(view);
-			if (auto entity = core::engine::entity_get(scene.croot, scene.cam))
-				cam.update_from(**entity);
+			if (auto entity = scene.get<core::engine::Entity>(scene.cam))
+				cam.update_from(*entity);
 
 			// Clear the screen ready for the next frame of rendering
-			this->clear(glm::vec3(0, 0, 0.1));
+			this->clear(glm::vec3(0, 0, 1.1));
 
 			// Render each figure object in the scene
 			render_figures(scene, cam);

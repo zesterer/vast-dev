@@ -53,18 +53,6 @@ namespace vast::gfx
 		}
 	}
 
-	// Create a new figure component
-	void figure_create(core::ComponentRoot& root, id_t id)
-	{
-		// Create a dependency components first
-		core::engine::entity_create(root, id);
-
-		if (figure_pipeline)
-			figures.emplace(root, id);
-		else
-			util::panic("Tried to initiate Figure without first creating figure pipeline");
-	}
-
 	// Remove a figure component
 	void figure_remove(core::ComponentRoot& root, id_t id)
 	{
@@ -77,7 +65,7 @@ namespace vast::gfx
 		(void)dt;
 
 		for (auto pair : figures.components(root))
-			if (auto entity = core::engine::entity_get(root, pair.first)) // Update figure from entity
+			if (auto entity = core::engine::entities.get(root, pair.first)) // Update figure from entity
 				pair.second->update_from(*entity);
 	}
 
@@ -104,12 +92,12 @@ namespace vast::gfx
 		return core::ComponentVariant(
 			FIGURE_VARIANT_ID,
 			&figure_init,
-			&figure_create,
 			&figure_remove,
 			&figure_tick
 		);
 	}
 
+	// Render a single figure
 	void Figure::render(Pipeline& pipeline)
 	{
 		pipeline.set_uniform(*uni_mmat, this->mat);
@@ -123,5 +111,31 @@ namespace vast::gfx
 	__attribute__((constructor)) void register_figure_var()
 	{
 		FIGURE_VARIANT_ID = core::cm_register_component();
+	}
+}
+
+namespace vast::core
+{
+	using namespace gfx;
+
+	template <> Figure* Scene::get<Figure>(id_t id)
+	{
+		auto figure = figures.get(this->croot, id);
+		if (figure)
+			return &**figure;
+		else
+			return nullptr;
+	}
+
+	template <> id_t Scene::create<Figure>()
+	{
+		id_t id = this->create<engine::Entity>();
+
+		if (figure_pipeline)
+			figures.emplace(this->croot, id, *figure_pipeline);
+		else
+			util::panic("Creating Figure without creating pipeline");
+
+		return id;
 	}
 }

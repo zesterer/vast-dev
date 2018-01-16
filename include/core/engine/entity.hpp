@@ -41,12 +41,6 @@ namespace vast::core::engine
 	// A box containing all entities
 	extern core::ComponentBox<Entity> entities;
 
-	// Get a reference to an entity, given a component root and an object id
-	util::Result<std::shared_ptr<Entity>, core::ComponentError> entity_get(ComponentRoot const& root, id_t id);
-
-	// Create a new entity component
-	void entity_create(ComponentRoot& root, id_t id);
-
 	// Remove an entity component
 	void entity_remove(ComponentRoot& root, id_t id);
 
@@ -60,6 +54,7 @@ namespace vast::core::engine
 namespace vast::core
 {
 	template <> engine::Entity* Scene::get<engine::Entity>(id_t id);
+	template <> id_t Scene::create<engine::Entity>();
 }
 
 #endif
