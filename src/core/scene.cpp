@@ -1,6 +1,7 @@
 // Local
 #include <core/scene.hpp>
 #include <engine/entity.hpp>
+#include <engine/volume.hpp>
 #include <gfx/figure.hpp>
 
 namespace vast::core

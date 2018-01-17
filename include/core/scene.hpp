@@ -141,10 +141,10 @@ namespace vast::core
 		static ComponentBox<T> box;
 
 		// Required
-		static void init(Scene& root);
-		static id_t create(Scene& root);
-		static void remove(Scene& root, id_t id);
-		static void tick(Scene& root, float dt);
+		static void init(Scene& scene);
+		static id_t create(Scene& scene);
+		static void remove(Scene& scene, id_t id);
+		static void tick(Scene& scene, float dt);
 
 		static ComponentCall get_calls()
 		{

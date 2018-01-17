@@ -1,12 +1,12 @@
 #ifndef VAST_HPP_ENGINE_ENTITY
 #define VAST_HPP_ENGINE_ENTITY
 
+// Local
+#include <core/scene.hpp>
+
 // Lib
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-
-// Local
-#include <core/scene.hpp>
 
 // Std
 #include <iostream>

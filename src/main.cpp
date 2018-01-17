@@ -2,6 +2,7 @@
 #include <ui/win.hpp>
 #include <core/scene.hpp>
 #include <engine/entity.hpp>
+#include <engine/volume.hpp>
 #include <gfx/renderer.hpp>
 #include <gfx/figure.hpp>
 
@@ -21,6 +22,7 @@ namespace vast
 
 		// Add component variants to the scene
 		scene.calls.push_back(core::Component<engine::Entity>::get_calls());
+		scene.calls.push_back(core::Component<engine::Volume>::get_calls());
 		scene.calls.push_back(core::Component<gfx::Figure>::get_calls());
 
 		// Set up scene
