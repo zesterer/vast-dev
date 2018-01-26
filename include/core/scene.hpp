@@ -107,16 +107,17 @@ namespace vast::core
 		}
 
 		template <typename ... Args>
-		bool emplace(Scene const& scene, id_t id, Args ... args)
+		std::shared_ptr<T> emplace(Scene const& scene, id_t id, Args ... args)
 		{
 			auto it = this->_items[scene.id].find(id);
 			if (it == this->_items[scene.id].end())
 			{
-				this->_items[scene.id][id] = std::make_shared<T>(args ...);
-				return true;
+				auto ptr = std::make_shared<T>(args ...);
+				this->_items[scene.id][id] = ptr;
+				return ptr;
 			}
 			else
-				return false;
+				return it->second;
 		}
 
 		void remove(Scene const& scene, id_t id)

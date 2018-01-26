@@ -17,7 +17,7 @@ namespace vast::engine
 	{
 		void tick(float dt)
 		{
-			// Nothing yet
+			(void)dt;
 		}
 
 		Vessel() { std::cout << "Created Vessel" << std::endl; }
