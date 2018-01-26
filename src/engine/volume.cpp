@@ -14,11 +14,9 @@ namespace vast::core
 		std::cout << "Volume component initiated!" << std::endl;
 	}
 
-	template<> id_t Component<Volume>::create(Scene& scene)
+	template<> void Component<Volume>::add(Scene& scene, id_t id)
 	{
-		id_t nid = scene.new_object();
-		self::box.emplace(scene, nid, glm::ivec3(9, 9, 9));
-		return nid;
+		self::box.emplace(scene, id, glm::ivec3(9, 9, 9));
 	}
 
 	template<> void Component<Volume>::tick(Scene& scene, float dt)

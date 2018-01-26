@@ -40,7 +40,7 @@ namespace vast::gfx
 				cam.update_from(*entity);
 
 			// Clear the screen ready for the next frame of rendering
-			this->clear(glm::vec3(0, 0, 1.1));
+			this->clear(glm::vec3(0, 0, 0.1));
 
 			// Render each figure object in the scene
 			render_figures(scene, cam);

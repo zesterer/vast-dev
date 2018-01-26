@@ -75,17 +75,15 @@ namespace vast::core
 		std::cout << "Figure component initiated!" << std::endl;
 	}
 
-	template<> id_t Component<Figure>::create(Scene& scene)
+	template<> void Component<Figure>::add(Scene& scene, id_t id)
 	{
-		// Create an entity first
-		id_t nid = scene.create<engine::Entity>();
+		// Add an entity first
+		Component<engine::Entity>::add(scene, id);
 
 		if (figure_pipeline)
-			self::box.emplace(scene, nid, *figure_pipeline);
+			self::box.emplace(scene, id, *figure_pipeline);
 		else
 			util::panic("Creating Figure without creating pipeline");
-
-		return nid;
 	}
 
 	template<> void Component<Figure>::tick(Scene& scene, float dt)

@@ -22,23 +22,23 @@ namespace vast::core
 	struct ComponentCall
 	{
 		typedef std::function<void (Scene&)> init_t;
-		typedef std::function<id_t (Scene&)> create_t;
+		typedef std::function<void (Scene&, id_t)> add_t;
 		typedef std::function<void (Scene&, id_t)> remove_t;
 		typedef std::function<void (Scene&, float)> tick_t;
 
 		init_t init;
-		create_t create;
+		add_t add;
 		remove_t remove;
 		tick_t tick;
 
 		ComponentCall(
 			init_t init,
-			create_t create,
+			add_t add,
 			remove_t remove,
 			tick_t tick
 		) :
 			init(init),
-			create(create),
+			add(add),
 			remove(remove),
 			tick(tick)
 		{}
@@ -142,7 +142,7 @@ namespace vast::core
 
 		// Required
 		static void init(Scene& scene);
-		static id_t create(Scene& scene);
+		static void add(Scene& scene, id_t id);
 		static void remove(Scene& scene, id_t id);
 		static void tick(Scene& scene, float dt);
 
@@ -150,7 +150,7 @@ namespace vast::core
 		{
 			return ComponentCall(
 				Component<T>::init,
-				Component<T>::create,
+				Component<T>::add,
 				Component<T>::remove,
 				Component<T>::tick
 			);
@@ -166,7 +166,12 @@ namespace vast::core
 	};
 
 	template <typename T> T* Scene::get(id_t id) { return Component<T>::get(*this, id); }
-	template <typename T> id_t Scene::create() { return Component<T>::create(*this); }
+	template <typename T> id_t Scene::create()
+	{
+		id_t nid = this->new_object();
+		Component<T>::add(*this, nid);
+		return nid;
+	}
 }
 
 #endif

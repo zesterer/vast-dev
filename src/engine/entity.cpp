@@ -14,11 +14,9 @@ namespace vast::core
 		std::cout << "Entity component initiated!" << std::endl;
 	}
 
-	template<> id_t Component<Entity>::create(Scene& scene)
+	template<> void Component<Entity>::add(Scene& scene, id_t id)
 	{
-		id_t nid = scene.new_object();
-		self::box.emplace(scene, nid);
-		return nid;
+		self::box.emplace(scene, id);
 	}
 
 	template<> void Component<Entity>::tick(Scene& scene, float dt)

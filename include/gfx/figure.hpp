@@ -51,7 +51,9 @@ namespace vast::gfx
 			// 	)
 			// });
             //
-			// this->model = res::Model(m,
+			// this->model = res::Model(
+			// 	pipeline,
+			// 	m,
 			// 	gl::GL_TRIANGLES,
 			// 	{
 			// 		{ "vert_pos", FormatType::F32, 3 }, // Position
@@ -91,7 +93,7 @@ namespace vast::core
 	using namespace gfx;
 
 	template<> void Component<Figure>::init(Scene& scene);
-	template<> id_t Component<Figure>::create(Scene& scene);
+	template<> void Component<Figure>::add(Scene& scene, id_t id);
 	template<> void Component<Figure>::remove(Scene& scene, id_t id);
 	template<> void Component<Figure>::tick(Scene& scene, float dt);
 }

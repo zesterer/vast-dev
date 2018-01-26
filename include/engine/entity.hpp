@@ -37,7 +37,7 @@ namespace vast::core
 	using namespace engine;
 
 	template<> void Component<Entity>::init(Scene& scene);
-	template<> id_t Component<Entity>::create(Scene& scene);
+	template<> void Component<Entity>::add(Scene& scene, id_t id);
 	template<> void Component<Entity>::remove(Scene& scene, id_t id);
 	template<> void Component<Entity>::tick(Scene& scene, float dt);
 }
