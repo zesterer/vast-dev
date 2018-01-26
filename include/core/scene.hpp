@@ -65,7 +65,7 @@ namespace vast::core
 		}
 
 		template <typename T> T* get(id_t id);
-		template <typename T> id_t create();
+		template <typename ... Args> id_t create();
 		void remove(id_t id)
 		{
 			for (size_t i = this->calls.size(); i-- > 0;)
@@ -166,10 +166,24 @@ namespace vast::core
 	};
 
 	template <typename T> T* Scene::get(id_t id) { return Component<T>::get(*this, id); }
-	template <typename T> id_t Scene::create()
+
+	// Try to ignore this horribleness
+	template <typename ... Args> void _create_comp(Scene& scene, id_t id);
+	template <> void _create_comp<>(Scene& scene, id_t id);
+	template <typename T, typename ... Args>
+	void _create_comp_helper(Scene& scene, id_t id) {
+		Component<T>::add(scene, id);
+		return _create_comp<Args...>(scene, id);
+	}
+	template <typename ... Args>
+	void _create_comp(Scene& scene, id_t id) {
+		_create_comp_helper<Args...>(scene, id);
+	}
+
+	template <typename ... Args> id_t Scene::create()
 	{
 		id_t nid = this->new_object();
-		Component<T>::add(*this, nid);
+		_create_comp<Args...>(*this, nid);
 		return nid;
 	}
 }

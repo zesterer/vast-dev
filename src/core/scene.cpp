@@ -2,11 +2,17 @@
 #include <core/scene.hpp>
 #include <engine/entity.hpp>
 #include <engine/volume.hpp>
+#include <engine/vessel.hpp>
 #include <gfx/figure.hpp>
+
+#include <stdlib.h>
 
 namespace vast::core
 {
 	int Scene::_scene_counter = 0;
+
+	// To fix some horribleness in scene.hpp
+	template <> void _create_comp<>(Scene& scene, id_t id) { (void)scene; (void)id; }
 
 	void Scene::setup()
 	{
@@ -18,7 +24,7 @@ namespace vast::core
 
 		this->create<gfx::Figure>();
 
-		if (auto entity = this->get<engine::Entity>(this->create<gfx::Figure>()))
+		if (auto entity = this->get<engine::Entity>(this->create<gfx::Figure, engine::Vessel>()))
 			entity->pos = glm::vec3(8, 8, 0);
 	}
 
