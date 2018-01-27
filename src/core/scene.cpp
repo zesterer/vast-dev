@@ -4,6 +4,7 @@
 #include <engine/volume.hpp>
 #include <engine/vessel.hpp>
 #include <gfx/figure.hpp>
+#include <gfx/body.hpp>
 
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@ namespace vast::core
 
 		this->create<gfx::Figure>();
 
-		if (auto entity = this->get<engine::Entity>(this->create<gfx::Figure, engine::Vessel>()))
+		if (auto entity = this->get<engine::Entity>(this->create<gfx::Body, engine::Vessel>()))
 			entity->pos = glm::vec3(8, 8, 0);
 	}
 
@@ -33,7 +34,7 @@ namespace vast::core
 		if (auto cam = this->get<engine::Entity>(this->cam))
 		{
 			float per = this->time * 0.01f;
-			cam->pos = glm::vec3(-glm::cos(per), glm::sin(per), 0) * 7.0f;
+			cam->pos = glm::vec3(-glm::cos(per), glm::sin(per), 0) * 8.0f + glm::vec3(0, 0, 3);
 			cam->ori = glm::rotate(glm::quat(), -per, glm::vec3(0, 0, 1));
 		}
 

@@ -16,15 +16,27 @@ namespace vast::gfx::res
 	{
 		bool _valid;
 		gl::GLuint gl_id;
+		gl::GLuint gl_buffer_id;
 		gl::GLenum gl_primitive;
 		size_t vertex_count;
 
 		void bind() const
 		{
 			if (this->_valid)
-				gl::glBindBuffer(gl::GL_ARRAY_BUFFER, this->gl_id);
+				gl::glBindVertexArray(this->gl_id);
 			else
 				util::panic("Attempted to bind invalid model");
+		}
+
+		void set_mesh(Mesh const& mesh)
+		{
+			this->bind();
+
+			// Bind model buffer
+			gl::glBindBuffer(gl::GL_ARRAY_BUFFER, this->gl_buffer_id);
+
+			// Load data into VBO
+			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * mesh.get_vertex_count(), mesh.get_data(), gl::GL_STATIC_DRAW);
 		}
 
 		Model() : _valid(false), vertex_count(0) {}
@@ -43,12 +55,9 @@ namespace vast::gfx::res
 			gl::glBindVertexArray(this->gl_id);
 
 			// Generate and bind VBO
-			gl::GLuint vbo_gl_id;
-			gl::glGenBuffers(1, &vbo_gl_id);
-			gl::glBindBuffer(gl::GL_ARRAY_BUFFER, vbo_gl_id);
+			gl::glGenBuffers(1, &this->gl_buffer_id);
 
-			// Load data into VBO
-			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * mesh.get_vertex_count(), mesh.get_data(), gl::GL_STATIC_DRAW);
+			this->set_mesh(mesh);
 
 			// Bind format
 			bind_format_attributes(pipeline.shader, this->gl_id, attrs);

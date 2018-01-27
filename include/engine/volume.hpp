@@ -25,6 +25,7 @@ namespace vast::engine
 		glm::ivec3 size;
 		glm::vec3 center;
 		std::vector<Voxel> voxels;
+		int rev = 0;
 
 		void set(int x, int y, int z, Voxel vox)
 		{

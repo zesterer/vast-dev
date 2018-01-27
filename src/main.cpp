@@ -6,6 +6,7 @@
 #include <engine/vessel.hpp>
 #include <gfx/renderer.hpp>
 #include <gfx/figure.hpp>
+#include <gfx/body.hpp>
 
 namespace vast
 {
@@ -26,6 +27,7 @@ namespace vast
 		scene.calls.push_back(core::Component<engine::Volume>::get_calls());
 		scene.calls.push_back(core::Component<engine::Vessel>::get_calls());
 		scene.calls.push_back(core::Component<gfx::Figure>::get_calls());
+		scene.calls.push_back(core::Component<gfx::Body>::get_calls());
 
 		// Set up scene
 		scene.setup();
