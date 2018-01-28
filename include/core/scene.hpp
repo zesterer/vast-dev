@@ -2,6 +2,7 @@
 #define VAST_HPP_CORE_SCENE
 
 // Local
+#include <core/input.hpp>
 #include <util/result.hpp>
 
 // Lib
@@ -55,7 +56,7 @@ namespace vast::core
 
 		std::vector<ComponentCall> calls;
 
-		id_t cam;
+		id_t root, player, cam;
 
 		float time;
 
@@ -74,6 +75,7 @@ namespace vast::core
 		}
 
 		void tick(float dt);
+		void handle_inputs(InputState const& instate);
 		void setup();
 		void clear();
 

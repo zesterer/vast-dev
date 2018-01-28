@@ -18,16 +18,16 @@ namespace vast::gfx
 		uni_pmat;
 
 	// Render a single figure
-	void Figure::render(Pipeline& pipeline)
+	void Figure::render(engine::Entity const& entity, Pipeline& pipeline)
 	{
-		pipeline.set_uniform(*uni_mmat, this->mat);
+		pipeline.set_uniform(*uni_mmat, entity.mat);
 
 		this->model.bind();
 
 		gl::glDrawArrays(this->model.gl_primitive, 0, this->model.vertex_count);
 	}
 
-	void render_figures(core::Scene const& scene, Camera const& cam)
+	void render_figures(core::Scene& scene, Camera const& cam)
 	{
 		if (!figure_pipeline) // Only continue if the figure pipeline has been configured
 			return;
@@ -40,7 +40,8 @@ namespace vast::gfx
 
 		// Render each figure
 		for (auto figure : core::Component<Figure>::box.items(scene))
-			figure.second->render(*figure_pipeline);
+			if (auto entity = scene.get<engine::Entity>(figure.first))
+				figure.second->render(*entity, *figure_pipeline);
 	}
 }
 
@@ -90,9 +91,9 @@ namespace vast::core
 	{
 		(void)dt;
 
-		for (auto figure : self::box.items(scene))
-			if (auto entity = scene.get<engine::Entity>(figure.first))
-				figure.second->update_from(*entity);
+		//for (auto figure : self::box.items(scene))
+		//	if (auto entity = scene.get<engine::Entity>(figure.first))
+		//		figure.second->update_from(*entity);
 	}
 
 	template<> void Component<Figure>::remove(Scene& scene, id_t id)

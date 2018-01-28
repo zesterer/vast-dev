@@ -17,31 +17,60 @@ namespace vast::engine
 	{
 		int data;
 
+		bool solid()
+		{
+			return this->data != 0;
+		}
+
 		Voxel(int data = 0) : data(data) {}
+
+		static Voxel empty()
+		{
+			return Voxel();
+		}
 	};
 
+	// A component that encapsulates all volumetric structures
+	// Examples: Spacecraft, space stations, houses, etc.
 	struct Volume
 	{
 		glm::ivec3 size;
-		glm::vec3 center;
 		std::vector<Voxel> voxels;
 		int rev = 0;
 
-		void set(int x, int y, int z, Voxel vox)
+		Voxel get(int x, int y, int z) const
 		{
-			this->voxels[
-				x * this->size[2] * this->size[1] +
-				y * this->size[1] +
+			if (
+				x < 0 || y < 0 || z < 0 ||
+				x >= this->size.x || y >= this->size.y || z >= this->size.z
+			)
+				return Voxel::empty();
+
+			return this->voxels[
+				x * this->size.y * this->size.z +
+				y * this->size.z +
 				z
-			] = vox;
+			];
 		}
 
-		Volume(glm::ivec3 size, glm::vec3 center = glm::vec3(0)) :
+		void set(int x, int y, int z, Voxel vox)
+		{
+			if (
+				x >= 0 && y >= 0 && z >= 0 &&
+				x < this->size.x && y < this->size.y && z < this->size.z
+			)
+				this->voxels[
+					x * this->size.y * this->size.z +
+					y * this->size.z +
+					z
+				] = vox;
+		}
+
+		Volume(glm::ivec3 size) :
 			size(size),
-			center(center),
 			voxels(size.x * size.y * size.z)
 		{
-			std::cout << "Created Volume" << std::endl;
+			std::cout << "Created Volume of size (" << this->size.x << "," << this->size.y << "," << this->size.z << ")" << std::endl;
 		}
 
 		~Volume() { std::cout << "Deleted Volume" << std::endl; }

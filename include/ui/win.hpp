@@ -2,6 +2,7 @@
 #define VAST_HPP_UI_WIN
 
 // Local
+#include <core/input.hpp>
 #include <util/panic.hpp>
 #include <util/result.hpp>
 #include <gfx/view.hpp>
@@ -18,6 +19,9 @@ namespace vast::ui
 		GLFWwindow* _gwin;
 		gfx::View view;
 
+		core::InputState input_state;
+		bool cursor_trapped;
+
 		static void add_callbacks_for(Win& win);
 		static void remove_callbacks_for(Win& win);
 
@@ -27,6 +31,16 @@ namespace vast::ui
 				return false;
 			else
 				return !glfwWindowShouldClose(this->_gwin);
+		}
+
+		void set_cursor_trapped(bool trapped)
+		{
+			this->cursor_trapped = trapped;
+
+			if (this->cursor_trapped)
+				glfwSetInputMode(this->_gwin, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			else
+				glfwSetInputMode(this->_gwin, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
 
 		void open()
@@ -47,7 +61,11 @@ namespace vast::ui
 			// Set window callbacks
 			Win::add_callbacks_for(*this);
 
+			// Switch active GL context to the context in this window
 			glfwMakeContextCurrent(this->_gwin);
+
+			// Trap the cursor
+			this->set_cursor_trapped(this->cursor_trapped);
 		}
 
 		enum class PollError { InvalidWindow };
@@ -57,7 +75,24 @@ namespace vast::ui
 				return util::Status<PollError>::failure(PollError::InvalidWindow);
 			else
 			{
+				// Poll window events
 				glfwPollEvents();
+
+				if (this->cursor_trapped)
+				{
+					// Record cursor position, reset cursor, and remember offset
+					double
+						tgt_x = this->view.width / 2,
+						tgt_y = this->view.height / 2
+					;
+					double cursor_x, cursor_y;
+					glfwGetCursorPos(this->_gwin, &cursor_x, &cursor_y);
+					glfwSetCursorPos(this->_gwin, tgt_x, tgt_y);
+
+					this->input_state.look_offset.x = static_cast<float>(cursor_x - tgt_x);
+					this->input_state.look_offset.y = static_cast<float>(cursor_y - tgt_y);
+				}
+
 				return util::Status<PollError>::success();
 			}
 		}
@@ -85,7 +120,7 @@ namespace vast::ui
 			this->view.height = h;
 		}
 
-		Win() : view(gfx::View(800, 500)) {}
+		Win() : view(gfx::View(800, 500)), cursor_trapped(true) {}
 
 		~Win()
 		{

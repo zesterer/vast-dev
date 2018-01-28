@@ -13,6 +13,8 @@
 
 namespace vast::engine
 {
+	// A component that encapsulates all voxel-based dynamic bodies.
+	// Examples: Spacecraft, space station, asteroids, submarines, land vehicles, rocks
 	struct Vessel
 	{
 		void tick(float dt)

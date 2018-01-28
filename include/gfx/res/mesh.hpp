@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <utility>
 #include <fstream>
 #include <sstream>
 #include <initializer_list>
@@ -25,7 +26,12 @@ namespace vast::gfx::res
 		glm::vec2 uv;
 
 		Vert() : pos(glm::vec3(0)), col(glm::vec3(0)), norm(glm::vec3(0)), uv(glm::vec2(0)){}
-		Vert(glm::vec3 pos, glm::vec3 col, glm::vec3 norm, glm::vec2 uv) :
+		Vert(
+			glm::vec3 pos,
+			glm::vec3 col,
+			glm::vec3 norm,
+			glm::vec2 uv
+		) :
 			pos(pos),
 			col(col),
 			norm(norm),
@@ -47,6 +53,32 @@ namespace vast::gfx::res
 
 		Poly() {}
 		Poly(Vert v0, Vert v1, Vert v2) : v0(v0), v1(v1), v2(v2) {}
+	};
+
+	// A single quad
+	struct Quad
+	{
+		Vert v00, v10, v01, v11;
+
+		std::pair<Poly, Poly> to_polys()
+		{
+			return {
+				Poly(v10, v01, v00),
+				Poly(v11, v01, v10)
+			};
+		}
+
+		Quad(
+			Vert v00,
+			Vert v10,
+			Vert v01,
+			Vert v11
+		) :
+			v00(v00),
+			v10(v10),
+			v01(v01),
+			v11(v11)
+		{}
 	};
 
 	struct OBJMesh
@@ -159,6 +191,13 @@ namespace vast::gfx::res
 		std::vector<Poly> _polys;
 
 		size_t size() const { return this->_polys.size(); }
+
+		void add(Quad q)
+		{
+			auto polys = q.to_polys();
+			this->_polys.push_back(polys.first);
+			this->_polys.push_back(polys.second);
+		}
 
 		void add(Poly p) { this->_polys.push_back(p); }
 		void add(std::initializer_list<Poly> polys)

@@ -12,13 +12,13 @@ in vec2 frag_uv;
 
 out vec4 tgt_color;
 
-const vec3 sun_dir = normalize(vec3(-2, -1, -1));
+const vec3 sun_dir = normalize(vec3(2, 1, 3));
 const vec3 sun_color = vec3(1, 1, 0.9);
 const float sun_factor = 50;
 const float sun_shine = 0;
 
 const float surf_diffuse = 0.5;
-const float surf_ambiance = 0.2;
+const float surf_ambiance = 0.0;
 
 void main()
 {

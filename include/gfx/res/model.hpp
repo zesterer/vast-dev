@@ -35,8 +35,10 @@ namespace vast::gfx::res
 			// Bind model buffer
 			gl::glBindBuffer(gl::GL_ARRAY_BUFFER, this->gl_buffer_id);
 
+			this->vertex_count = mesh.get_vertex_count();
+
 			// Load data into VBO
-			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * mesh.get_vertex_count(), mesh.get_data(), gl::GL_STATIC_DRAW);
+			gl::glBufferData(gl::GL_ARRAY_BUFFER, sizeof(Vert) * this->vertex_count, mesh.get_data(), gl::GL_STATIC_DRAW);
 		}
 
 		Model() : _valid(false), vertex_count(0) {}

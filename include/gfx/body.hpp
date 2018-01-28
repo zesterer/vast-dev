@@ -14,33 +14,11 @@ namespace vast::gfx
 {
 	struct Body
 	{
-		int volume_rev = 0;
+		int _volume_rev = 0;
 
-		void check_remesh(engine::Volume const& volume, Figure& figure)
-		{
-			if (this->volume_rev != volume.rev)
-			{
-				this->volume_rev = volume.rev;
+		void update_mesh(engine::Volume const& volume, Figure& figure);
 
-				res::Mesh m;
-				m.add({
-					res::Poly(
-						res::Vert(glm::vec3(1, -1, -0.5), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-						res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-						res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
-					),
-					res::Poly(
-						res::Vert(glm::vec3(1, 1, -0.5), glm::vec3(1, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-						res::Vert(glm::vec3(-1, 1, -0.5), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1), glm::vec2(0, 0)),
-						res::Vert(glm::vec3(-1, -1, -0.5), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1), glm::vec2(0, 0))
-					)
-				});
-
-				figure.model.set_mesh(m);
-			}
-		}
-
-		Body(engine::Volume const& volume) : volume_rev(volume.rev - 1) // Incorrect rev will trigger remesh
+		Body(engine::Volume const& volume) : _volume_rev(volume.rev - 1) // Incorrect rev will trigger remesh
 		{
 			std::cout << "Created Body" << std::endl;
 		}

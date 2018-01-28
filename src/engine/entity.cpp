@@ -21,8 +21,10 @@ namespace vast::core
 
 	template<> void Component<Entity>::tick(Scene& scene, float dt)
 	{
-		for (auto entity : self::box.items(scene))
-			entity.second->tick(dt);
+		if (auto entity = self::get(scene, scene.root))
+		{
+			entity->tick(scene, glm::mat4(1), dt);
+		}
 	}
 
 	template<> void Component<Entity>::remove(Scene& scene, id_t id)

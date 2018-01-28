@@ -4,6 +4,7 @@
 #include <engine/entity.hpp>
 #include <engine/volume.hpp>
 #include <engine/vessel.hpp>
+#include <engine/agent.hpp>
 #include <gfx/renderer.hpp>
 #include <gfx/figure.hpp>
 #include <gfx/body.hpp>
@@ -26,6 +27,7 @@ namespace vast
 		scene.calls.push_back(core::Component<engine::Entity>::get_calls());
 		scene.calls.push_back(core::Component<engine::Volume>::get_calls());
 		scene.calls.push_back(core::Component<engine::Vessel>::get_calls());
+		scene.calls.push_back(core::Component<engine::Agent>::get_calls());
 		scene.calls.push_back(core::Component<gfx::Figure>::get_calls());
 		scene.calls.push_back(core::Component<gfx::Body>::get_calls());
 
@@ -37,6 +39,9 @@ namespace vast
 		{
 			// Poll window events
 			win.poll().except("Could not poll window");
+
+			// Let the scene handle window inputs
+			scene.handle_inputs(win.input_state);
 
 			// Simulate the scene
 			scene.tick(1.0f);
