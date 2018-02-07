@@ -27,16 +27,7 @@ namespace vast::gfx
 		{
 			glm::normalize(this->_ori);
 
-			//this->mat = this->_ori * this->mat; // <--- Not this!
-
 			this->vmat = glm::mat4(1);
-
-			//this->vmat = glm::rotate(this->vmat, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)); // Yaw
-
-			// Transform to standard coordinate space
-			//this->vmat = glm::rotate(this->vmat, glm::radians(-40.0f), glm::vec3(0.0, 1.0, 0.0));
-			//this->vmat = glm::rotate(this->vmat, glm::radians(-90.0f), glm::vec3(0.0, 0.0, 1.0));
-
 			this->vmat = glm::rotate(this->vmat, glm::radians(+90.0f), glm::vec3(0.0, 1.0, 0.0));
 			this->vmat = glm::rotate(this->vmat, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
 
@@ -45,7 +36,7 @@ namespace vast::gfx
 
 			//this->vmat = glm::inverse(this->vmat);
 
-			this->pmat = glm::perspective(glm::radians(this->_fov), this->_sr, std::numeric_limits<float>::min(), 1.0f);
+			this->pmat = glm::perspective(glm::radians(this->_fov), this->_sr, std::numeric_limits<float>::min(), 100.0f);
 		}
 
 		void set_view(View const& view)
@@ -62,8 +53,8 @@ namespace vast::gfx
 
 		void update_from(engine::Entity const& entity)
 		{
-			this->_pos = entity.pos;
-			this->_ori = entity.ori;
+			this->_pos = entity.mat * glm::vec4(0, 0, 0, 1);
+			this->_ori = glm::quat_cast(entity.mat);
 
 			this->update();
 		}

@@ -15,6 +15,9 @@ namespace vast::gfx
 			case FormatType::F32:
 				stride += sizeof(gl::GLfloat) * std::get<2>(attr);
 				break;
+			case FormatType::I32:
+				stride += sizeof(gl::GLint) * std::get<2>(attr);
+				break;
 			default:
 				break;
 			}
@@ -37,6 +40,9 @@ namespace vast::gfx
 				{
 				case FormatType::F32:
 					gl::glVertexAttribPointer(loc, std::get<2>(attr), gl::GL_FLOAT, gl::GL_FALSE, stride, reinterpret_cast<void*>(offset));
+					break;
+				case FormatType::I32:
+					gl::glVertexAttribPointer(loc, std::get<2>(attr), gl::GL_INT, gl::GL_FALSE, stride, reinterpret_cast<void*>(offset));
 					break;
 				default:
 					break;

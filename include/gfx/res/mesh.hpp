@@ -22,13 +22,15 @@ namespace vast::gfx::res
 	// A single vertex
 	struct Vert
 	{
-		glm::vec3 pos, col, norm;
+		glm::vec3 pos;
+		glm::vec4 col;
+		glm::vec3 norm;
 		glm::vec2 uv;
 
-		Vert() : pos(glm::vec3(0)), col(glm::vec3(0)), norm(glm::vec3(0)), uv(glm::vec2(0)){}
+		Vert() : pos(glm::vec3(0)), col(glm::vec4(0)), norm(glm::vec3(0)), uv(glm::vec2(0)){}
 		Vert(
 			glm::vec3 pos,
-			glm::vec3 col,
+			glm::vec4 col,
 			glm::vec3 norm,
 			glm::vec2 uv
 		) :
@@ -113,7 +115,7 @@ namespace vast::gfx::res
 			if (ind[2].y >= 0) p.v1.norm = this->norms[ind[2].y];
 			if (ind[2].z >= 0) p.v2.norm = this->norms[ind[2].z];
 
-			p.v0.col = p.v1.col = p.v2.col = glm::vec3(1);
+			p.v0.col = p.v1.col = p.v2.col = glm::vec4(1);
 
 			return p;
 		}

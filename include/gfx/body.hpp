@@ -14,11 +14,13 @@ namespace vast::gfx
 {
 	struct Body
 	{
+		core::ObjIdent ident;
+
 		int _volume_rev = 0;
 
 		void update_mesh(engine::Volume const& volume, Figure& figure);
 
-		Body(engine::Volume const& volume) : _volume_rev(volume.rev - 1) // Incorrect rev will trigger remesh
+		Body(core::ObjIdent ident, engine::Volume const& volume) : ident(ident), _volume_rev(volume.rev - 1) // Incorrect rev will trigger remesh
 		{
 			std::cout << "Created Body" << std::endl;
 		}
@@ -32,8 +34,8 @@ namespace vast::core
 	using namespace gfx;
 
 	template<> void Component<Body>::init(Scene& scene);
-	template<> void Component<Body>::add(Scene& scene, id_t id);
-	template<> void Component<Body>::remove(Scene& scene, id_t id);
+	template<> void Component<Body>::add(Scene& scene, oid_t id);
+	template<> void Component<Body>::remove(Scene& scene, oid_t id);
 	template<> void Component<Body>::tick(Scene& scene, float dt);
 }
 

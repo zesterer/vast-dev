@@ -14,20 +14,18 @@ namespace vast::core
 		std::cout << "Entity component initiated!" << std::endl;
 	}
 
-	template<> void Component<Entity>::add(Scene& scene, id_t id)
+	template<> void Component<Entity>::add(Scene& scene, oid_t id)
 	{
-		self::box.emplace(scene, id);
+		self::box.emplace(scene, id, ObjIdent(id, scene));
 	}
 
 	template<> void Component<Entity>::tick(Scene& scene, float dt)
 	{
 		if (auto entity = self::get(scene, scene.root))
-		{
-			entity->tick(scene, glm::mat4(1), dt);
-		}
+			entity->tick(glm::mat4(1), dt);
 	}
 
-	template<> void Component<Entity>::remove(Scene& scene, id_t id)
+	template<> void Component<Entity>::remove(Scene& scene, oid_t id)
 	{
 		self::box.remove(scene, id);
 	}

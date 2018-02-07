@@ -10,21 +10,27 @@
 namespace vast::gfx
 {
 	// The pipeline and uniforms used for all figures
-	static std::optional<Pipeline> figure_pipeline;
+	std::optional<Pipeline> figure_pipeline;
 	static std::optional<Uniform>
 		uni_time,
 		uni_mmat,
 		uni_vmat,
-		uni_pmat;
+		uni_pmat,
+		uni_tex;
 
 	// Render a single figure
-	void Figure::render(engine::Entity const& entity, Pipeline& pipeline)
+	void Figure::render(engine::Entity const& entity, Pipeline& pipeline, size_t layer)
 	{
+		// Don't try to render if the layer isn't ready / doesn't exist
+		if (!this->layers[layer].is_valid())
+			return;
+
 		pipeline.set_uniform(*uni_mmat, entity.mat);
+		pipeline.bind_texture(*uni_tex, this->texture);
 
-		this->model.bind();
+		this->layers[layer].bind();
 
-		gl::glDrawArrays(this->model.gl_primitive, 0, this->model.vertex_count);
+		gl::glDrawArrays(this->layers[layer].gl_primitive, 0, this->layers[layer].vertex_count);
 	}
 
 	void render_figures(core::Scene& scene, Camera const& cam)
@@ -39,9 +45,10 @@ namespace vast::gfx
 		figure_pipeline->set_uniform(*uni_pmat, cam.pmat);
 
 		// Render each figure
-		for (auto figure : core::Component<Figure>::box.items(scene))
-			if (auto entity = scene.get<engine::Entity>(figure.first))
-				figure.second->render(*entity, *figure_pipeline);
+		for (size_t layer = 0; layer < FIGURE_LAYERS; layer ++)
+			for (auto figure : core::Component<Figure>::box.items(scene))
+				if (auto entity = scene.get<engine::Entity>(figure.first))
+					figure.second->render(*entity, *figure_pipeline, layer);
 	}
 }
 
@@ -71,32 +78,30 @@ namespace vast::core
 			uni_mmat = figure_pipeline->get_uniform("uni_mmat").data_or(Uniform(-1));
 			uni_vmat = figure_pipeline->get_uniform("uni_vmat").data_or(Uniform(-1));
 			uni_pmat = figure_pipeline->get_uniform("uni_pmat").data_or(Uniform(-1));
+			uni_tex = figure_pipeline->get_uniform("uni_tex").data_or(Uniform(-1));
 		}
 
 		std::cout << "Figure component initiated!" << std::endl;
 	}
 
-	template<> void Component<Figure>::add(Scene& scene, id_t id)
+	template<> void Component<Figure>::add(Scene& scene, oid_t id)
 	{
 		// Add an entity first
 		Component<engine::Entity>::add(scene, id);
 
 		if (figure_pipeline)
-			self::box.emplace(scene, id, *figure_pipeline);
+			self::box.emplace(scene, id, ObjIdent(id, scene));
 		else
 			util::panic("Creating Figure without creating pipeline");
 	}
 
 	template<> void Component<Figure>::tick(Scene& scene, float dt)
 	{
+		(void)scene;
 		(void)dt;
-
-		//for (auto figure : self::box.items(scene))
-		//	if (auto entity = scene.get<engine::Entity>(figure.first))
-		//		figure.second->update_from(*entity);
 	}
 
-	template<> void Component<Figure>::remove(Scene& scene, id_t id)
+	template<> void Component<Figure>::remove(Scene& scene, oid_t id)
 	{
 		self::box.remove(scene, id);
 	}

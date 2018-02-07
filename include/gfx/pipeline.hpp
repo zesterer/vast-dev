@@ -3,6 +3,7 @@
 
 // Local
 #include <gfx/res/shader.hpp>
+#include <gfx/res/texture.hpp>
 #include <gfx/format.hpp>
 
 // Std
@@ -33,12 +34,6 @@ namespace vast::gfx
 		res::Shader shader;
 		Target target;
 
-		void bind() const
-		{
-			this->shader.use();
-			this->target.bind();
-		}
-
 		util::Result<Uniform, Error> get_uniform(std::string const& str) const
 		{
 			gl::GLint gl_id = gl::glGetUniformLocation(this->shader.gl_id, str.c_str());
@@ -68,6 +63,30 @@ namespace vast::gfx
 				gl::glUniformMatrix4fv(uniform.gl_id, 1, gl::GL_FALSE, &m[0][0]);
 				return util::Status<Error>::success();
 			}
+		}
+
+		util::Status<Error> set_uniform(Uniform uniform, int i)
+		{
+			if (uniform.gl_id == -1)
+				return util::Status<Error>::failure(Error::INVALID_UNIFORM);
+			else
+			{
+				gl::glUniform1i(uniform.gl_id, i);
+				return util::Status<Error>::success();
+			}
+		}
+
+		void bind() const
+		{
+			this->shader.use();
+			this->target.bind();
+		}
+
+		void bind_texture(Uniform uniform, res::Texture const& tex, int index = 0)
+		{
+			this->set_uniform(uniform, index);
+			gl::glActiveTexture(gl::GL_TEXTURE0 + index);
+			tex.bind();
 		}
 
 		Pipeline(

@@ -4,21 +4,22 @@ uniform float uni_time;
 uniform mat4 uni_mmat;
 uniform mat4 uni_vmat;
 uniform mat4 uni_pmat;
+uniform sampler2D uni_tex;
 
 in vec3 frag_pos;
-in vec3 frag_color;
+in vec4 frag_color;
 in vec3 frag_norm;
 in vec2 frag_uv;
 
 out vec4 tgt_color;
 
-const vec3 sun_dir = normalize(vec3(2, 1, 3));
+const vec3 sun_dir = normalize(vec3(1, 2, -3));
 const vec3 sun_color = vec3(1, 1, 0.9);
 const float sun_factor = 50;
-const float sun_shine = 0;
+const float sun_shine = 0.05;
 
-const float surf_diffuse = 0.5;
-const float surf_ambiance = 0.0;
+const float surf_diffuse = 1.0;
+const float surf_ambiance = 0.2;
 
 void main()
 {
@@ -41,5 +42,5 @@ void main()
 	vec3 light = ambience + diffuse + specular;
 
 	// Target color
-	tgt_color = vec4(frag_color * light, 1.0);
+	tgt_color = frag_color * vec4(texture2D(uni_tex, frag_uv).rgb * light, 1);
 }

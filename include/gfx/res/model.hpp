@@ -20,6 +20,11 @@ namespace vast::gfx::res
 		gl::GLenum gl_primitive;
 		size_t vertex_count;
 
+		bool is_valid()
+		{
+			return this->_valid;
+		}
+
 		void bind() const
 		{
 			if (this->_valid)

@@ -9,8 +9,12 @@ namespace vast::core
 	struct InputState
 	{
 		glm::vec2 look_offset;
+		glm::vec3 move_target;
 
-		InputState() : look_offset(glm::vec2(0)) {}
+		InputState() :
+			look_offset(glm::vec2(0)),
+			move_target(glm::vec3(0))
+		{}
 	};
 }
 
